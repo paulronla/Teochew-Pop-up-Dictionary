@@ -1,0 +1,52 @@
+{
+    "author": "Paul La",
+    "background": {
+        "page": "background.html",
+		"persistent": true
+    },
+    "browser_action": {
+        "default_icon": {
+			"20": "images/teochew_20.png",
+            "40": "images/teochew_40.png",
+			"48": "images/teochew_48.png"
+        },
+        "default_title": "Teochew Chinese Pop-up Dictionary"
+    },
+    "content_scripts": [
+        {
+            "all_frames": true,
+            "js": [
+                "js/jquery-3.3.1.min.js",
+                "content.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "description": "Great tool for learning Chinese vocabulary in Teochew.",
+    "homepage_url": "https://github.com/paulronla/Mandarin-To-Teochew-Mapper",
+    "icons": {
+        "16": "images/teochew_16.png",
+        "48": "images/teochew_48.png",
+        "128": "images/teochew_128.png"
+    },
+    "manifest_version": 2,
+    "name": "Teochew Pop-up Dictionary",
+    "options_page": "options.html",
+    "permissions": [
+        "contextMenus",
+        "tabs"
+    ],
+    "short_name": "Teochew",
+    "version": "1.0.0",
+    "web_accessible_resources": [
+        "css/*",
+        "js/*",
+        "images/*"
+    ],
+    "-ms-preload": {
+        "backgroundScript": "backgroundScriptsAPIBridge.js",
+        "contentScript": "contentScriptsAPIBridge.js"
+    }
+}
