@@ -3,7 +3,7 @@
 A Chrome Extension that displays the Mandarin and Teochew pronunciations for Chinese characters
 
 ## Legal
-Copyright (C) Teochew Pop-up Dictionary -- Paul La
+Copyright (C) 2019 Paul La
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
