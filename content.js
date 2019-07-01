@@ -84,6 +84,8 @@ let savedSelStartOffset = 0;
 
 let savedSelEndList = [];
 
+let inPopup = false;
+
 function enableTab() {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('keydown', onKeyDown);
@@ -103,6 +105,9 @@ function disableTab() {
     }
     let zhongwenWindow = document.getElementById('zhongwen-window');
     if (zhongwenWindow) {
+		zhongwenWindow.removeEventListener("mouseover", mouseOverPopup)
+		zhongwenWindow.removeEventListener("mouseout", mouseOutPopup)
+		
         zhongwenWindow.parentNode.removeChild(zhongwenWindow);
     }
 
@@ -386,6 +391,9 @@ function onMouseMove(mouseMove) {
             }
         }
     }
+	
+	if (inPopup)
+		return;
 
     if (clientX && clientY) {
         if (mouseMove.clientX === clientX && mouseMove.clientY === clientY) {
@@ -615,6 +623,9 @@ function showPopup(html, elem, x, y, looseWidth) {
         popup = document.createElement('div');
         popup.setAttribute('id', 'zhongwen-window');
         document.documentElement.appendChild(popup);
+		
+		popup.addEventListener("mouseover", mouseOverPopup)
+		popup.addEventListener("mouseout", mouseOutPopup)
     }
 
     popup.style.width = 'auto';
@@ -686,11 +697,11 @@ function showPopup(html, elem, x, y, looseWidth) {
             }
 
             // below the mouse
-            let v = 25;
+            let v = 0;
 
             // go up if necessary
             if (y + v + pH > window.innerHeight) {
-                let t = y - pH - 30;
+                let t = y - pH - 5;
                 if (t >= 0) {
                     y = t;
                 }
@@ -719,6 +730,14 @@ function hidePopup() {
         popup.style.display = 'none';
         popup.textContent = '';
     }
+}
+
+function mouseOverPopup() {
+	inPopup = true;
+}
+
+function mouseOutPopup() {
+	inPopup = false;
 }
 
 function highlightMatch(doc, rangeStartNode, rangeStartOffset, matchLen, selEndList) {
@@ -856,6 +875,7 @@ function makeHtml(result, showToneColors) {
     let html = '';
     let texts = [];
     let hanziClass;
+	let nondefClass;
 
     if (result === null) return '';
 
@@ -870,17 +890,23 @@ function makeHtml(result, showToneColors) {
             let word = result.data[i][1];
 
             hanziClass = 'w-hanzi';
+			nondefClass = 'w-nondef';
             if (config.fontSize === 'small') {
                 hanziClass += '-small';
+				nondefClass += '-small';
             }
+			html += '<div class="' + nondefClass + '">'
             html += '<span class="' + hanziClass + '">' + word + '</span>&nbsp;';
 
         } else {
 
             hanziClass = 'w-hanzi';
+			nondefClass = 'w-nondef';
             if (config.fontSize === 'small') {
                 hanziClass += '-small';
+				nondefClass += '-small';
             }
+			html += '<div class="' + nondefClass + '">'
             html += '<span class="' + hanziClass + '">' + entry[2] + '</span>&nbsp;';
             if (entry[1] !== entry[2]) {
                 html += '<span class="' + hanziClass + '">' + entry[1] + '</span>&nbsp;';
@@ -900,13 +926,14 @@ function makeHtml(result, showToneColors) {
         // Zhuyin
 
         if (config.zhuyin === 'yes') {
-            html += '<br>' + p[2];
+            html += '</div><div class="' + nondefClass + '">' + p[2];
         }
 		
 		// Chaoyin
 
 		html += '<span class="' + hanziClass + '">&nbsp;</span>'
 		html += chaoyin(entry[4], showToneColors, pinyinClass);
+		html += '</div>';
 
         // Definition
 
@@ -915,7 +942,7 @@ function makeHtml(result, showToneColors) {
             defClass += '-small';
         }
         let translation = entry[5].replace(/\//g, '; ');
-        html += '<br><span class="' + defClass + '">' + translation + '</span><br>';
+        html += '<span class="' + defClass + '">' + translation + '</span><br>';
 
         // Grammar
         if (config.grammar !== 'no' && result.grammar && result.grammar.index === i) {
@@ -991,7 +1018,7 @@ function chaoyin(syllables, showToneColors, pinyinClass) {
         let syllable = a[i];
 
         if (i > 0) {
-            html += '&nbsp;';
+            html += ' ';
         }
 		
 		let toneNum = [1,3,4,5][i%4];
@@ -1024,7 +1051,7 @@ function pinyinAndZhuyin(syllables, showToneColors, pinyinClass) {
         }
 
         if (i > 0) {
-            html += '&nbsp;';
+            html += ' ';
             text += ' ';
             zhuyin += '&nbsp;';
         }

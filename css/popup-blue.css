@@ -53,6 +53,12 @@
   font-size: 16px;
 }
 
+#zhongwen-window .w-nondef {
+  font-size: 18px;
+  margin-left: 1em;
+  text-indent: -1em;
+}
+
 #zhongwen-window .w-hanzi-small {
         font-size: 18px;
   color: #B7E7FF;
@@ -71,6 +77,12 @@
 #zhongwen-window .w-zhuyin-small {
   font-family: PMingLiU, 'Apple LiGothic', sans-serif;
   font-size: 12px;
+}
+
+#zhongwen-window .w-nondef-small {
+  font-size: 16px;
+  margin-left: 1em;
+  text-indent: -1em;
 }
 
 #zhongwen-window .grammar {
