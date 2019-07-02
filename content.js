@@ -1,7 +1,7 @@
 /*
  Teochew Pop-up Dictionary
  Copyright (C) 2019 Paul La
- https://github.com/paulronla/	
+ https://github.com/paulronla/    
 
  --- 
  
@@ -60,6 +60,8 @@ let savedRangeNode;
 
 let savedRangeOffset;
 
+let savedLineHeight;
+
 let selText;
 
 let clientX;
@@ -105,9 +107,9 @@ function disableTab() {
     }
     let zhongwenWindow = document.getElementById('zhongwen-window');
     if (zhongwenWindow) {
-		zhongwenWindow.removeEventListener("mouseover", mouseOverPopup)
-		zhongwenWindow.removeEventListener("mouseout", mouseOutPopup)
-		
+        zhongwenWindow.removeEventListener("mouseenter", mouseEntersPopup)
+        zhongwenWindow.removeEventListener("mouseleave", mouseLeavesPopup)
+        
         zhongwenWindow.parentNode.removeChild(zhongwenWindow);
     }
 
@@ -391,10 +393,10 @@ function onMouseMove(mouseMove) {
             }
         }
     }
-	
-	if (inPopup)
-		return;
-
+    
+    if (inPopup)
+        return;
+    
     if (clientX && clientY) {
         if (mouseMove.clientX === clientX && mouseMove.clientY === clientY) {
             return;
@@ -406,6 +408,7 @@ function onMouseMove(mouseMove) {
     let range;
     let rangeNode;
     let rangeOffset;
+    let rangeRect;
 
     // Handle Chrome and Firefox
     if (document.caretRangeFromPoint) {
@@ -415,6 +418,10 @@ function onMouseMove(mouseMove) {
         }
         rangeNode = range.startContainer;
         rangeOffset = range.startOffset;
+        let rangeRects = range.getClientRects();
+        
+        if (rangeRects)
+            rangeRect = rangeRects[0];
     } else if (document.caretPositionFromPoint) {
         range = document.caretPositionFromPoint(mouseMove.clientX, mouseMove.clientY);
         if (range === null) {
@@ -422,6 +429,7 @@ function onMouseMove(mouseMove) {
         }
         rangeNode = range.offsetNode;
         rangeOffset = range.offset;
+        rangeRect = range.getClientRect();
     }
 
     if (mouseMove.target === savedTarget) {
@@ -453,8 +461,16 @@ function onMouseMove(mouseMove) {
     selStartIncrement = 1;
 
     if (rangeNode && rangeNode.data && rangeOffset < rangeNode.data.length) {
-        popX = mouseMove.clientX;
-        popY = mouseMove.clientY;
+        let lineHeight = parseInt(window.getComputedStyle(document.elementFromPoint(clientX, clientY)).getPropertyValue('line-height'), 10);
+        savedLineHeight = Math.min(lineHeight, rangeRect ? rangeRect.height : lineHeight);
+        
+        if (rangeRect) {
+            popY = rangeRect.height + rangeRect.top;
+            popX = rangeRect.left;
+        }
+        else 
+            popY = mouseMove.clientY;
+            popX = mouseMove.clientX;
         timer = setTimeout(() => triggerSearch(), 50);
         return;
     }
@@ -463,7 +479,7 @@ function onMouseMove(mouseMove) {
     let dx = popX - mouseMove.clientX;
     let dy = popY - mouseMove.clientY;
     let distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance > 4) {
+    if (distance > 8) {
         clearHighlight();
         hidePopup();
     }
@@ -623,9 +639,9 @@ function showPopup(html, elem, x, y, looseWidth) {
         popup = document.createElement('div');
         popup.setAttribute('id', 'zhongwen-window');
         document.documentElement.appendChild(popup);
-		
-		popup.addEventListener("mouseover", mouseOverPopup)
-		popup.addEventListener("mouseout", mouseOutPopup)
+        
+        popup.addEventListener("mouseenter", mouseEntersPopup)
+        popup.addEventListener("mouseleave", mouseLeavesPopup)
     }
 
     popup.style.width = 'auto';
@@ -701,7 +717,7 @@ function showPopup(html, elem, x, y, looseWidth) {
 
             // go up if necessary
             if (y + v + pH > window.innerHeight) {
-                let t = y - pH - 5;
+                let t = y - pH - savedLineHeight - 5;
                 if (t >= 0) {
                     y = t;
                 }
@@ -732,12 +748,12 @@ function hidePopup() {
     }
 }
 
-function mouseOverPopup() {
-	inPopup = true;
+function mouseEntersPopup() {
+    inPopup = true;
 }
 
-function mouseOutPopup() {
-	inPopup = false;
+function mouseLeavesPopup() {
+    inPopup = false;
 }
 
 function highlightMatch(doc, rangeStartNode, rangeStartOffset, matchLen, selEndList) {
@@ -875,7 +891,7 @@ function makeHtml(result, showToneColors) {
     let html = '';
     let texts = [];
     let hanziClass;
-	let nondefClass;
+    let nondefClass;
 
     if (result === null) return '';
 
@@ -890,23 +906,23 @@ function makeHtml(result, showToneColors) {
             let word = result.data[i][1];
 
             hanziClass = 'w-hanzi';
-			nondefClass = 'w-nondef';
+            nondefClass = 'w-nondef';
             if (config.fontSize === 'small') {
                 hanziClass += '-small';
-				nondefClass += '-small';
+                nondefClass += '-small';
             }
-			html += '<div class="' + nondefClass + '">'
+            html += '<div class="' + nondefClass + '">'
             html += '<span class="' + hanziClass + '">' + word + '</span>&nbsp;';
 
         } else {
 
             hanziClass = 'w-hanzi';
-			nondefClass = 'w-nondef';
+            nondefClass = 'w-nondef';
             if (config.fontSize === 'small') {
                 hanziClass += '-small';
-				nondefClass += '-small';
+                nondefClass += '-small';
             }
-			html += '<div class="' + nondefClass + '">'
+            html += '<div class="' + nondefClass + '">'
             html += '<span class="' + hanziClass + '">' + entry[2] + '</span>&nbsp;';
             if (entry[1] !== entry[2]) {
                 html += '<span class="' + hanziClass + '">' + entry[1] + '</span>&nbsp;';
@@ -928,12 +944,12 @@ function makeHtml(result, showToneColors) {
         if (config.zhuyin === 'yes') {
             html += '</div><div class="' + nondefClass + '">' + p[2];
         }
-		
-		// Chaoyin
+        
+        // Chaoyin
 
-		html += '<span class="' + hanziClass + '">&nbsp;</span>'
-		html += chaoyin(entry[4], showToneColors, pinyinClass);
-		html += '</div>';
+        html += '<span class="' + hanziClass + '">&nbsp;</span>'
+        html += chaoyin(entry[4], showToneColors, pinyinClass);
+        html += '</div>';
 
         // Definition
 
@@ -1020,8 +1036,8 @@ function chaoyin(syllables, showToneColors, pinyinClass) {
         if (i > 0) {
             html += ' ';
         }
-		
-		let toneNum = [1,3,4,5][i%4];
+        
+        let toneNum = [1,3,4,5][i%4];
         if (showToneColors) {
             html += '<span class="' + pinyinClass + ' tone' + toneNum + '">';
         } else {
