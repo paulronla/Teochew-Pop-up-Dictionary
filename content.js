@@ -62,6 +62,8 @@ let savedRangeOffset;
 
 let savedLineHeight;
 
+let savedDY;
+
 let selText;
 
 let clientX;
@@ -394,8 +396,15 @@ function onMouseMove(mouseMove) {
         }
     }
     
-    if (inPopup)
-        return;
+	let popup = document.getElementById('zhongwen-window');
+	
+    if (popup && popup.style.display === 'none') {
+		inPopup = false;
+	}
+	
+	if (inPopup) {
+		return;
+	}
     
     if (clientX && clientY) {
         if (mouseMove.clientX === clientX && mouseMove.clientY === clientY) {
@@ -462,11 +471,11 @@ function onMouseMove(mouseMove) {
 
     if (rangeNode && rangeNode.data && rangeOffset < rangeNode.data.length) {
         let lineHeight = parseInt(window.getComputedStyle(document.elementFromPoint(clientX, clientY)).getPropertyValue('line-height'), 10);
-        savedLineHeight = Math.min(lineHeight, rangeRect ? rangeRect.height : lineHeight);
+        savedLineHeight = Math.min(lineHeight, rangeRect ? Math.floor(rangeRect.height) : lineHeight);
         
         if (rangeRect) {
-            popY = rangeRect.height + rangeRect.top;
-            popX = rangeRect.left;
+            popY = Math.floor(rangeRect.height + rangeRect.top);
+            popX = Math.floor(rangeRect.left);
         }
         else 
             popY = mouseMove.clientY;
@@ -476,10 +485,19 @@ function onMouseMove(mouseMove) {
     }
 
     // Don't close just because we moved from a valid pop-up slightly over to a place with nothing.
-    let dx = popX - mouseMove.clientX;
-    let dy = popY - mouseMove.clientY;
-    let distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance > 8) {
+	let dx = popX - mouseMove.clientX;
+    let dy = popup && !popup.style.display ? parseInt(popup.style.top, 10) - mouseMove.clientY - window.scrollY : popY - mouseMove.clientY;
+	
+	if (savedDY !== undefined && (Math.abs(savedDY) < Math.abs(dy)) && popup && !popup.style.display) {
+		savedDY = dy;
+		clearHighlight();
+		hidePopup();
+		return
+	}
+	
+	savedDY = dy;
+	
+    if (popup && (mouseMove.clientX < parseInt(popup.style.left, 10) || mouseMove.clientX > parseInt(window.getComputedStyle(popup).getPropertyValue('right'), 10))) {
         clearHighlight();
         hidePopup();
     }
@@ -707,9 +725,13 @@ function showPopup(html, elem, x, y, looseWidth) {
             // go left if necessary
             if (x + pW > window.innerWidth - 20) {
                 x = (window.innerWidth - pW) - 20;
-                if (x < 0) {
-                    x = 0;
-                }
+            }
+			else {
+				x -= Math.floor(pW/3);
+			}
+			
+			if (x < 0) {
+                x = 0;
             }
 
             // below the mouse
@@ -723,6 +745,8 @@ function showPopup(html, elem, x, y, looseWidth) {
                 }
             }
             else y += v;
+			
+			savedDY = Math.abs(y - clientY);
 
             x += window.scrollX;
             y += window.scrollY;
