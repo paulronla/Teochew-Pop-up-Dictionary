@@ -396,15 +396,15 @@ function onMouseMove(mouseMove) {
         }
     }
     
-	let popup = document.getElementById('zhongwen-window');
-	
+    let popup = document.getElementById('zhongwen-window');
+    
     if (popup && popup.style.display === 'none') {
-		inPopup = false;
-	}
-	
-	if (inPopup) {
-		return;
-	}
+        inPopup = false;
+    }
+    
+    if (inPopup) {
+        return;
+    }
     
     if (clientX && clientY) {
         if (mouseMove.clientX === clientX && mouseMove.clientY === clientY) {
@@ -474,7 +474,7 @@ function onMouseMove(mouseMove) {
         savedLineHeight = Math.min(lineHeight, rangeRect ? Math.floor(rangeRect.height) : lineHeight);
         
         if (rangeRect) {
-            popY = Math.floor(rangeRect.height + rangeRect.top);
+            popY = Math.floor(rangeRect.bottom);
             popX = Math.floor(rangeRect.left);
         }
         else 
@@ -484,20 +484,19 @@ function onMouseMove(mouseMove) {
         return;
     }
 
-    // Don't close just because we moved from a valid pop-up slightly over to a place with nothing.
-	let dx = popX - mouseMove.clientX;
-    let dy = popup && !popup.style.display ? parseInt(popup.style.top, 10) - mouseMove.clientY - window.scrollY : popY - mouseMove.clientY;
-	
-	if (savedDY !== undefined && (Math.abs(savedDY) < Math.abs(dy)) && popup && !popup.style.display) {
-		savedDY = dy;
-		clearHighlight();
-		hidePopup();
-		return
-	}
-	
-	savedDY = dy;
-	
-    if (popup && (mouseMove.clientX < parseInt(popup.style.left, 10) || mouseMove.clientX > parseInt(window.getComputedStyle(popup).getPropertyValue('right'), 10))) {
+    let dy = popup && !popup.style.display ? parseInt(popup.style.top, 10) - mouseMove.clientY - window.scrollY : null;
+    
+    if (savedDY !== undefined && dy !== null && (Math.abs(savedDY) < Math.abs(dy)) && popup && !popup.style.display) {
+        savedDY = dy;
+        clearHighlight();
+        hidePopup();
+        return
+    }
+    
+    if (dy !== null)
+        savedDY = dy;
+    
+    if (popup && (mouseMove.clientX < parseInt(popup.style.left, 10) || mouseMove.clientX > (parseInt(popup.style.left, 10) + parseInt(window.getComputedStyle(popup).getPropertyValue('width'), 10)))) {
         clearHighlight();
         hidePopup();
     }
@@ -726,11 +725,11 @@ function showPopup(html, elem, x, y, looseWidth) {
             if (x + pW > window.innerWidth - 20) {
                 x = (window.innerWidth - pW) - 20;
             }
-			else {
-				x -= Math.floor(pW/3);
-			}
-			
-			if (x < 0) {
+            else {
+                x -= Math.floor(pW/3);
+            }
+            
+            if (x < 0) {
                 x = 0;
             }
 
@@ -745,8 +744,8 @@ function showPopup(html, elem, x, y, looseWidth) {
                 }
             }
             else y += v;
-			
-			savedDY = Math.abs(y - clientY);
+            
+            savedDY = y - clientY;
 
             x += window.scrollX;
             y += window.scrollY;
