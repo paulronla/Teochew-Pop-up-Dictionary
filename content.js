@@ -90,6 +90,8 @@ let savedSelEndList = [];
 
 let inPopup = false;
 
+let popupAboveMouse = false;
+
 function enableTab() {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('keydown', onKeyDown);
@@ -405,6 +407,11 @@ function onMouseMove(mouseMove) {
     if (inPopup) {
         return;
     }
+	
+	if (popupAboveMouse && popup && !popup.style.display && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
+		clearHighlight();
+        hidePopup();
+	}
     
     if (clientX && clientY) {
         if (mouseMove.clientX === clientX && mouseMove.clientY === clientY) {
@@ -458,8 +465,23 @@ function onMouseMove(mouseMove) {
     }
 
     if (!rangeNode || rangeNode.parentNode !== mouseMove.target) {
-        rangeNode = null;
-        rangeOffset = -1;
+        //microsoft edge not detecting the first character with caretRangeFromPoint() sometimes
+        range = document.createRange();
+        range.selectNode(mouseMove.target);
+        rangeNode = {
+            'data': range.toString(),
+            'parentNode': mouseMove.target,
+            'ownerDocument': range.startContainer.ownerDocument
+        };
+        rangeOffset = 0;
+        let rangeRects = range.getClientRects();
+        if (rangeRects)
+            rangeRect = rangeRects[0];
+
+        if (!rangeNode || rangeNode.parentNode !== mouseMove.target || !rangeNode.data) {
+            rangeNode = null;
+            rangeOffset = -1;
+        }
     }
 
     savedTarget = mouseMove.target;
@@ -741,9 +763,13 @@ function showPopup(html, elem, x, y, looseWidth) {
                 let t = y - pH - savedLineHeight - 5;
                 if (t >= 0) {
                     y = t;
+					popupAboveMouse = true;
                 }
             }
-            else y += v;
+            else { 
+				y += v;
+				popupAboveMouse = false;
+			}
             
             savedDY = y - clientY;
 
