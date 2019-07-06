@@ -408,7 +408,7 @@ function onMouseMove(mouseMove) {
         return;
     }
 	
-	if (popupAboveMouse && popup && !popup.style.display && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
+	if (popupAboveMouse && popup && popup.style.display === 'table' && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
 		clearHighlight();
         hidePopup();
 	}
@@ -454,6 +454,31 @@ function onMouseMove(mouseMove) {
         }
     }
 
+    for (; rangeOffset < rangeNode.data.length; rangeOffset++) {
+        if (!/\s/.test(rangeNode.data[rangeOffset]))
+            break;
+    }
+
+    if (rangeNode.parentNode !== mouseMove.target) {
+        //microsoft edge not detecting the first character with caretRangeFromPoint() sometimes
+        range = document.createRange();
+        range.selectNode(mouseMove.target);
+        let rangeNodeList = Array.from(mouseMove.target.childNodes).filter(n => n.nodeType === Node.TEXT_NODE);
+        if (rangeNodeList.length && rangeNodeList[0].data.trim()) {
+            rangeNode = rangeNodeList[0];
+            rangeOffset = 0;
+
+            for (; rangeOffset < rangeNode.data.length; rangeOffset++) {
+                if (!/\s/.test(rangeNode.data[rangeOffset]))
+                    break;
+            }
+
+            let rangeRects = range.getClientRects();
+            if (rangeRects)
+                rangeRect = rangeRects[0];
+        }
+    }
+
     if (timer) {
         clearTimeout(timer);
         timer = null;
@@ -465,23 +490,8 @@ function onMouseMove(mouseMove) {
     }
 
     if (!rangeNode || rangeNode.parentNode !== mouseMove.target) {
-        //microsoft edge not detecting the first character with caretRangeFromPoint() sometimes
-        range = document.createRange();
-        range.selectNode(mouseMove.target);
-        rangeNode = {
-            'data': range.toString(),
-            'parentNode': mouseMove.target,
-            'ownerDocument': range.startContainer.ownerDocument
-        };
-        rangeOffset = 0;
-        let rangeRects = range.getClientRects();
-        if (rangeRects)
-            rangeRect = rangeRects[0];
-
-        if (!rangeNode || rangeNode.parentNode !== mouseMove.target || !rangeNode.data) {
-            rangeNode = null;
-            rangeOffset = -1;
-        }
+        rangeNode = null;
+        rangeOffset = -1;
     }
 
     savedTarget = mouseMove.target;
@@ -506,9 +516,9 @@ function onMouseMove(mouseMove) {
         return;
     }
 
-    let dy = popup && !popup.style.display ? parseInt(popup.style.top, 10) - mouseMove.clientY - window.scrollY : null;
+    let dy = popup && popup.style.display === 'table' ? parseInt(popup.style.top, 10) - mouseMove.clientY - window.scrollY : null;
     
-    if (savedDY !== undefined && dy !== null && (Math.abs(savedDY) < Math.abs(dy)) && popup && !popup.style.display) {
+    if (savedDY !== undefined && dy !== null && (Math.abs(savedDY) < Math.abs(dy)) && popup && popup.style.display === 'table') {
         savedDY = dy;
         clearHighlight();
         hidePopup();
@@ -687,12 +697,15 @@ function showPopup(html, elem, x, y, looseWidth) {
     popup.style.height = 'auto';
     popup.style.maxWidth = (looseWidth ? '' : '600px');
 
+    let popupMaxWidth = parseInt(popup.style.maxWidth, 10);
+    popup.style.maxWidth = Math.min(Number.isNaN(popupMaxWidth) ? window.innerWidth : popupMaxWidth, window.innerWidth > window.innerHeight ? Math.floor(window.innerWidth/3) : window.innerWidth);
+
     $(popup).html(html);
 
     if (elem) {
         popup.style.top = '-1000px';
         popup.style.left = '0px';
-        popup.style.display = '';
+        popup.style.display = 'table';
 
         let pW = popup.offsetWidth;
         let pH = popup.offsetHeight;
@@ -785,7 +798,7 @@ function showPopup(html, elem, x, y, looseWidth) {
     if (x !== -1 && y !== -1) {
         popup.style.left = x + 'px';
         popup.style.top = y + 'px';
-        popup.style.display = '';
+        popup.style.display = 'table';
     }
 }
 
