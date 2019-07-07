@@ -88,8 +88,6 @@ let savedSelStartOffset = 0;
 
 let savedSelEndList = [];
 
-let inPopup = false;
-
 let popupAboveMouse = false;
 
 function enableTab() {
@@ -110,10 +108,7 @@ function disableTab() {
         zhongwenToneColors.parentNode.removeChild(zhongwenToneColors);
     }
     let zhongwenWindow = document.getElementById('zhongwen-window');
-    if (zhongwenWindow) {
-        zhongwenWindow.removeEventListener("mouseenter", mouseEntersPopup)
-        zhongwenWindow.removeEventListener("mouseleave", mouseLeavesPopup)
-        
+    if (zhongwenWindow) {        
         zhongwenWindow.parentNode.removeChild(zhongwenWindow);
     }
 
@@ -400,18 +395,13 @@ function onMouseMove(mouseMove) {
     
     let popup = document.getElementById('zhongwen-window');
     
-    if (popup && popup.style.display === 'none') {
-        inPopup = false;
-    }
-    
-    if (inPopup) {
+    if (inPopup(popup, mouseMove.clientX, mouseMove.clientY))
         return;
-    }
 	
-	if (popupAboveMouse && popup && popup.style.display === 'table' && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
-		clearHighlight();
-        hidePopup();
-	}
+	//if (popupAboveMouse && popup && popup.style.display === 'table' && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
+	//	clearHighlight();
+    //    hidePopup();
+	//}
     
     if (clientX && clientY) {
         if (mouseMove.clientX === clientX && mouseMove.clientY === clientY) {
@@ -454,11 +444,6 @@ function onMouseMove(mouseMove) {
         }
     }
 
-    for (; rangeOffset < rangeNode.data.length; rangeOffset++) {
-        if (!/\s/.test(rangeNode.data[rangeOffset]))
-            break;
-    }
-
     if (rangeNode.parentNode !== mouseMove.target) {
         //microsoft edge not detecting the first character with caretRangeFromPoint() sometimes
         range = document.createRange();
@@ -468,14 +453,21 @@ function onMouseMove(mouseMove) {
             rangeNode = rangeNodeList[0];
             rangeOffset = 0;
 
-            for (; rangeOffset < rangeNode.data.length; rangeOffset++) {
-                if (!/\s/.test(rangeNode.data[rangeOffset]))
-                    break;
-            }
-
             let rangeRects = range.getClientRects();
             if (rangeRects)
                 rangeRect = rangeRects[0];
+        }
+    }
+
+    if (rangeRect 
+        && inPopup(popup, rangeRect.left, rangeRect.top + rangeRect.height/2)) {
+            return;
+        }
+    
+    if (rangeNode.data) {
+        for (; rangeOffset < rangeNode.data.length; rangeOffset++) {
+            if (!/\s/.test(rangeNode.data[rangeOffset]))
+                break;
         }
     }
 
@@ -688,9 +680,6 @@ function showPopup(html, elem, x, y, looseWidth) {
         popup = document.createElement('div');
         popup.setAttribute('id', 'zhongwen-window');
         document.documentElement.appendChild(popup);
-        
-        popup.addEventListener("mouseenter", mouseEntersPopup)
-        popup.addEventListener("mouseleave", mouseLeavesPopup)
     }
 
     popup.style.width = 'auto';
@@ -698,7 +687,7 @@ function showPopup(html, elem, x, y, looseWidth) {
     popup.style.maxWidth = (looseWidth ? '' : '600px');
 
     let popupMaxWidth = parseInt(popup.style.maxWidth, 10);
-    popup.style.maxWidth = Math.min(Number.isNaN(popupMaxWidth) ? window.innerWidth : popupMaxWidth, window.innerWidth > window.innerHeight ? Math.floor(window.innerWidth/3) : window.innerWidth);
+    popup.style.maxWidth = Math.min(Number.isNaN(popupMaxWidth) ? window.innerWidth : popupMaxWidth, 1.5*window.innerWidth > window.innerHeight ? Math.floor(window.innerWidth/3) : window.innerWidth);
 
     $(popup).html(html);
 
@@ -810,12 +799,20 @@ function hidePopup() {
     }
 }
 
-function mouseEntersPopup() {
-    inPopup = true;
-}
+function inPopup(popup, x, y) {
+    if (popup) {
+        let top = parseInt(popup.style.top, 10) - window.scrollY;
+        let left = parseInt(popup.style.left, 10) - window.scrollX;
+        let height = parseInt(window.getComputedStyle(popup).getPropertyValue('height'), 10);
+        let width = parseInt(window.getComputedStyle(popup).getPropertyValue('width'), 10);
 
-function mouseLeavesPopup() {
-    inPopup = false;
+        return (top < y 
+            && (top + height) > y
+            && left < x
+            && (left + width) > x);
+    }
+
+    return false;
 }
 
 function highlightMatch(doc, rangeStartNode, rangeStartOffset, matchLen, selEndList) {
