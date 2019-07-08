@@ -395,13 +395,14 @@ function onMouseMove(mouseMove) {
     
     let popup = document.getElementById('zhongwen-window');
     
-    if (inPopup(popup, mouseMove.clientX, mouseMove.clientY))
+    if (inPopup(popup, mouseMove.clientX, mouseMove.clientY)) {
         return;
+    }
 	
-	//if (popupAboveMouse && popup && popup.style.display === 'table' && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
-	//	clearHighlight();
-    //    hidePopup();
-	//}
+	if (popupAboveMouse && popup && popup.style.display === 'table' && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
+		clearHighlight();
+        hidePopup();
+	}
     
     if (clientX && clientY) {
         if (mouseMove.clientX === clientX && mouseMove.clientY === clientY) {
@@ -458,11 +459,14 @@ function onMouseMove(mouseMove) {
                 rangeRect = rangeRects[0];
         }
     }
+    let lineHeight = parseInt(window.getComputedStyle(document.elementFromPoint(clientX, clientY)).getPropertyValue('line-height'), 10);
 
     if (rangeRect 
-        && inPopup(popup, rangeRect.left, rangeRect.top + rangeRect.height/2)) {
-            return;
-        }
+        && inPopup(popup, rangeRect.left, 
+            rangeRect.top 
+            + (Number.isNaN(lineHeight) ? rangeRect.height/2 : Math.min(rangeRect.height, lineHeight)/2))) {
+        return;
+    }
     
     if (rangeNode.data) {
         for (; rangeOffset < rangeNode.data.length; rangeOffset++) {
@@ -494,16 +498,16 @@ function onMouseMove(mouseMove) {
     selStartIncrement = 1;
 
     if (rangeNode && rangeNode.data && rangeOffset < rangeNode.data.length) {
-        let lineHeight = parseInt(window.getComputedStyle(document.elementFromPoint(clientX, clientY)).getPropertyValue('line-height'), 10);
-        savedLineHeight = Math.min(lineHeight, rangeRect ? Math.floor(rangeRect.height) : lineHeight);
+        savedLineHeight = Number.isNaN(lineHeight) ? Math.floor(rangeRect.height) : Math.floor(Math.min(lineHeight, rangeRect.height));
         
         if (rangeRect) {
-            popY = Math.floor(rangeRect.bottom);
+            popY = Math.min(Math.floor(rangeRect.bottom), Math.floor(rangeRect.top + savedLineHeight));
             popX = Math.floor(rangeRect.left);
         }
-        else 
+        else {
             popY = mouseMove.clientY;
             popX = mouseMove.clientX;
+        }
         timer = setTimeout(() => triggerSearch(), 50);
         return;
     }
@@ -520,7 +524,7 @@ function onMouseMove(mouseMove) {
     if (dy !== null)
         savedDY = dy;
     
-    if (popup && (mouseMove.clientX < parseInt(popup.style.left, 10) || mouseMove.clientX > (parseInt(popup.style.left, 10) + parseInt(window.getComputedStyle(popup).getPropertyValue('width'), 10)))) {
+    if (popup && popup.style.display === 'table' && (mouseMove.clientX < parseInt(popup.style.left, 10) || mouseMove.clientX > (parseInt(popup.style.left, 10) + parseInt(window.getComputedStyle(popup).getPropertyValue('width'), 10)))) {
         clearHighlight();
         hidePopup();
     }
@@ -687,7 +691,7 @@ function showPopup(html, elem, x, y, looseWidth) {
     popup.style.maxWidth = (looseWidth ? '' : '600px');
 
     let popupMaxWidth = parseInt(popup.style.maxWidth, 10);
-    popup.style.maxWidth = Math.min(Number.isNaN(popupMaxWidth) ? window.innerWidth : popupMaxWidth, 1.5*window.innerWidth > window.innerHeight ? Math.floor(window.innerWidth/3) : window.innerWidth);
+    popup.style.maxWidth = Math.min(Number.isNaN(popupMaxWidth) ? window.innerWidth : popupMaxWidth, (1.5*window.innerWidth) > window.innerHeight ? Math.floor(window.innerWidth/3) : window.innerWidth);
 
     $(popup).html(html);
 
@@ -800,7 +804,7 @@ function hidePopup() {
 }
 
 function inPopup(popup, x, y) {
-    if (popup) {
+    if (popup && popup.style.display === 'table') {
         let top = parseInt(popup.style.top, 10) - window.scrollY;
         let left = parseInt(popup.style.left, 10) - window.scrollX;
         let height = parseInt(window.getComputedStyle(popup).getPropertyValue('height'), 10);
