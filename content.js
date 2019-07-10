@@ -464,10 +464,9 @@ function onMouseMove(mouseMove) {
 
     if (rangeRect 
         && popup
-        && inPopup(popup, rangeRect.left - window.scrollX, 
+        && inPopup(popup, rangeRect.left, 
             rangeRect.top 
-            + (Number.isNaN(lineHeight) ? rangeRect.height/2 : Math.min(rangeRect.height, lineHeight)/2)
-            - window.scrollY)) {
+            + (Number.isNaN(lineHeight) ? rangeRect.height/2 : Math.min(rangeRect.height, lineHeight)/2))) {
         return;
     }
     
@@ -821,14 +820,6 @@ function inPopup(popup, x, y) {
 
     return false;
 }
-
-/*function getZindex(node) {
-    while (node && node.nodeType !== 1) {
-        node = node.parentNode;
-    }
-
-    return window.getComputedStyle(node).getPropertyValue('z-index');
-}*/
 
 function highlightMatch(doc, rangeStartNode, rangeStartOffset, matchLen, selEndList) {
     if (!selEndList || selEndList.length === 0) return;
