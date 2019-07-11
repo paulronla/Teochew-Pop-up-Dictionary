@@ -395,7 +395,11 @@ function onMouseMove(mouseMove) {
     
     let popup = document.getElementById('zhongwen-window');
     
-    if (inPopup(popup, mouseMove.clientX, mouseMove.clientY)) {
+    if (inElem(popup, mouseMove.clientX, mouseMove.clientY)) {
+        return;
+    }
+
+    if (!inElem(mouseMove.target, mouseMove.clientX, mouseMove.clientY)) {
         return;
     }
 	
@@ -446,45 +450,28 @@ function onMouseMove(mouseMove) {
         }
     }
 
-    if (rangeNode.parentNode !== mouseMove.target) {
-        //microsoft edge not detecting the first character with caretRangeFromPoint() sometimes
-        range = document.createRange();
-        range.selectNode(mouseMove.target);
-        let rangeNodeList = Array.from(mouseMove.target.childNodes).filter(n => n.nodeType === Node.TEXT_NODE);
-        if (rangeNodeList.length && rangeNodeList[0].data.trim()) {
-            rangeNode = rangeNodeList[0];
-            rangeOffset = 0;
-
-            let rangeRects = range.getClientRects();
-            if (rangeRects)
-                rangeRect = rangeRects[0];
-        }
-    }
-    let lineHeight = parseInt(window.getComputedStyle(document.elementFromPoint(clientX, clientY)).getPropertyValue('line-height'), 10);
-
     if (rangeRect 
         && popup
-        && inPopup(popup, rangeRect.left, 
+        && inElem(popup, rangeRect.left, 
             rangeRect.top 
-            + (Number.isNaN(lineHeight) ? rangeRect.height/2 : Math.min(rangeRect.height, lineHeight)/2))) {
-        return;
+            + rangeRect.height/2)) {
+        rangeNode = null;
+        rangeOffset = -1;
     }
     
-    if (rangeNode.data) {
-        for (; rangeOffset < rangeNode.data.length; rangeOffset++) {
-            if (!/\s/.test(rangeNode.data[rangeOffset]))
-                break;
-        }
-    }
+    rangeOffset = moveOffsetToNonWhiteChar(rangeNode, rangeOffset);
 
     if (timer) {
         clearTimeout(timer);
         timer = null;
     }
 
-    if (rangeNode.data && rangeOffset === rangeNode.data.length) {
-        rangeNode = findNextTextNode(rangeNode.parentNode, rangeNode);
-        rangeOffset = 0;
+    if (rangeNode && rangeNode.data && rangeOffset === rangeNode.data.length) {
+        do {
+            rangeNode = findNextTextNode(rangeNode.parentNode, rangeNode);
+        }
+        while (!rangeNode.data.trim());
+        rangeOffset = moveOffsetToNonWhiteChar(rangeNode, 0);;
     }
 
     if (!rangeNode || rangeNode.parentNode !== mouseMove.target) {
@@ -500,10 +487,10 @@ function onMouseMove(mouseMove) {
     selStartIncrement = 1;
 
     if (rangeNode && rangeNode.data && rangeOffset < rangeNode.data.length) {
-        savedLineHeight = Number.isNaN(lineHeight) ? Math.floor(rangeRect.height) : Math.floor(Math.min(lineHeight, rangeRect.height));
+        savedLineHeight = Math.floor(rangeRect.height);
         
         if (rangeRect) {
-            popY = Math.min(Math.floor(rangeRect.bottom), Math.floor(rangeRect.top + savedLineHeight));
+            popY = Math.floor(rangeRect.bottom);
             popX = Math.floor(rangeRect.left);
         }
         else {
@@ -805,20 +792,28 @@ function hidePopup() {
     }
 }
 
-function inPopup(popup, x, y) {
-    if (popup && popup.style.display === 'table') {
-        let top = parseInt(popup.style.top, 10) - window.scrollY;
-        let left = parseInt(popup.style.left, 10) - window.scrollX;
-        let height = parseInt(window.getComputedStyle(popup).getPropertyValue('height'), 10);
-        let width = parseInt(window.getComputedStyle(popup).getPropertyValue('width'), 10);
+function inElem(elem, x, y) {
+    if (elem && elem.style.display !== 'none') {
+        let rect = elem.getBoundingClientRect();
 
-        return (top < y 
-            && (top + height) > y
-            && left < x
-            && (left + width) > x);
+        return (rect.top < y 
+            && (rect.bottom) > y
+            && rect.left < x
+            && (rect.right) > x);
     }
 
     return false;
+}
+
+function moveOffsetToNonWhiteChar(rangeNode, rangeOffset) {
+    if (rangeNode && rangeNode.data) {
+        for (; rangeOffset < rangeNode.data.length; rangeOffset++) {
+            if (!/\s/.test(rangeNode.data[rangeOffset]))
+                break;
+        }
+    }
+
+    return rangeOffset;
 }
 
 function highlightMatch(doc, rangeStartNode, rangeStartOffset, matchLen, selEndList) {
