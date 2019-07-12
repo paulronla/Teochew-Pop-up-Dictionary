@@ -398,12 +398,8 @@ function onMouseMove(mouseMove) {
     if (inElem(popup, mouseMove.clientX, mouseMove.clientY)) {
         return;
     }
-
-    if (!inElem(mouseMove.target, mouseMove.clientX, mouseMove.clientY)) {
-        return;
-    }
 	
-	if (popupAboveMouse && popup && popup.style.display === 'table' && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
+	if (popupAboveMouse && popup && popup.style.display !== 'none' && mouseMove.clientY < (parseInt(popup.style.top, 10) - window.scrollY)) {
 		clearHighlight();
         hidePopup();
         return;
@@ -471,10 +467,17 @@ function onMouseMove(mouseMove) {
             rangeNode = findNextTextNode(rangeNode.parentNode, rangeNode);
         }
         while (!rangeNode.data.trim());
-        rangeOffset = moveOffsetToNonWhiteChar(rangeNode, 0);;
+        rangeOffset = moveOffsetToNonWhiteChar(rangeNode, 0);
+
+        let range = document.createRange();
+        range.selectNode(rangeNode);
+        let rangeRects = range.getClientRects();
+
+        rangeRect = rangeRects ? rangeRects[0] : null;
     }
 
-    if (!rangeNode || rangeNode.parentNode !== mouseMove.target) {
+    if (!rangeNode || rangeNode.parentNode !== mouseMove.target 
+        || !inRect(rangeRect, mouseMove.clientX, mouseMove.clientY)) {
         rangeNode = null;
         rangeOffset = -1;
     }
@@ -501,9 +504,9 @@ function onMouseMove(mouseMove) {
         return;
     }
 
-    let dy = popup && popup.style.display === 'table' ? parseInt(popup.style.top, 10) - mouseMove.clientY - window.scrollY : null;
+    let dy = popup && popup.style.display !== 'none' ? parseInt(popup.style.top, 10) - mouseMove.clientY - window.scrollY : null;
     
-    if (savedDY !== undefined && dy !== null && (Math.abs(savedDY) < Math.abs(dy)) && popup && popup.style.display === 'table') {
+    if (savedDY !== undefined && dy !== null && (Math.abs(savedDY) < Math.abs(dy)) && popup && popup.style.display !== 'none') {
         savedDY = dy;
         clearHighlight();
         hidePopup();
@@ -513,7 +516,7 @@ function onMouseMove(mouseMove) {
     if (dy !== null)
         savedDY = dy;
     
-    if (popup && popup.style.display === 'table' && (mouseMove.clientX < (parseInt(popup.style.left, 10) - window.scrollX) || mouseMove.clientX > (parseInt(popup.style.left, 10) - window.scrollX + parseInt(window.getComputedStyle(popup).getPropertyValue('width'), 10)))) {
+    if (popup && popup.style.display !== 'none' && (mouseMove.clientX < (parseInt(popup.style.left, 10) - window.scrollX) || mouseMove.clientX > (parseInt(popup.style.left, 10) - window.scrollX + parseInt(window.getComputedStyle(popup).getPropertyValue('width'), 10)))) {
         clearHighlight();
         hidePopup();
     }
@@ -795,11 +798,24 @@ function hidePopup() {
 function inElem(elem, x, y) {
     if (elem && elem.style.display !== 'none') {
         let rect = elem.getBoundingClientRect();
-
+        
         return (rect.top < y 
             && (rect.bottom) > y
             && rect.left < x
             && (rect.right) > x);
+    }
+
+    return false;
+}
+
+function inRect(rect, x, y) {
+    if (rect) {
+        let width = rect.height; //Chinese chars are square
+
+        return (rect.top < y 
+            && (rect.bottom) > y
+            && (rect.left - width) < x
+            && (rect.right + width) > x);
     }
 
     return false;
