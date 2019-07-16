@@ -7,43 +7,55 @@ Number.isInteger = Number.isInteger || function(value) {
 };
 
 function lookupChaoyin(simpChars, pinyinStr, pinyinChaoyinDict) {
-    let pinyinArr = pinyinStr.split(' ');
-    let validSimpChars = mapInvalidChars(simpChars);
-    let chaoyinArr = [];
-    let chaoyinStr = '';
+    const pinyinArr = pinyinStr.split(' ');
+    const validSimpChars = mapInvalidChars(simpChars);
+    const chaoyinArr = [];
 
     if (pinyinArr.length > validSimpChars.length) {
         return '';
     }
 
     for (let i = 0; i < pinyinArr.length; i++) {
-        let char = validSimpChars[i];
-        let pinyin = pinyinArr[i].toLowerCase();
+        const char = validSimpChars[i];
+        const pinyin = pinyinArr[i].toLowerCase();
 
         if (pinyinChaoyinDict.hasOwnProperty(char)) {
-            let pinyinChaoyinMapping = pinyinChaoyinDict[char];
+            const pinyinChaoyinMapping = pinyinChaoyinDict[char];
 
             if (pinyinChaoyinMapping.hasOwnProperty(pinyin)) {
-                let chaoyin = pinyinChaoyinMapping[pinyin];
+                const chaoyin = pinyinChaoyinMapping[pinyin];
                 chaoyinArr.push(chaoyin);
             }
             else {
-                let chaoyinSet = new Set();
-                for (const p of Object.getOwnPropertyNames(pinyinChaoyinMapping)) {
-                    pinyinChaoyinMapping[p].split('|').forEach(chaoyin => chaoyinSet.add(chaoyin));
-                }
+                const chaoyinSet = new Set();
+                Object.getOwnPropertyNames(pinyinChaoyinMapping).forEach( 
+                    pinyin => pinyinChaoyinMapping[pinyin].split('|').forEach(
+                        chaoyin => chaoyinSet.add(chaoyin)
+                    )
+                );
 
                 chaoyinArr.push([...chaoyinSet].join('|'));
             }
         }
+        else {
+            chaoyinArr.push('???');
+        }
     }
+
+    for (const chaoyin of chaoyinArr) {
+        if (chaoyin !== '???') {
+            return chaoyinArr;
+        }
+    }
+
+    return [];
 }
 
 function mapInvalidChars(chineseChars) {
     const ans = [];
 
     for (const char of chineseChars) {
-        if (Number.isInteger(char)) {
+        if (char.trim() && !isNaN(char)) {
             ans.push(['〇','一','二','三','四','五','六','七','八','九'][parseInt(char, 10)]);
         }
         else if (~'，。？！'.indexOf(char)) {
