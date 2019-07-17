@@ -11,8 +11,8 @@ function lookupChaoyin(simpChars, pinyinStr, pinyinChaoyinDict) {
     const validSimpChars = mapInvalidChars(simpChars);
     const chaoyinArr = [];
 
-    if (pinyinArr.length > validSimpChars.length) {
-        return '';
+    if (!pinyinChaoyinDict || pinyinArr.length > validSimpChars.length) {
+        return chaoyinArr;
     }
 
     for (let i = 0; i < pinyinArr.length; i++) {
