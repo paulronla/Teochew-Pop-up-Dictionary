@@ -56,6 +56,8 @@ let tabIDs = {};
 
 let dict;
 
+let teochewDict;
+
 let zhongwenOptions = window.zhongwenOptions = {
     css: localStorage['popupcolor'] || 'yellow',
     tonecolors: localStorage['tonecolors'] || 'yes',
@@ -75,6 +77,13 @@ function activateExtension(tabId, showHelp) {
 
     if (!dict) {
         loadDictionary().then(r => dict = r);
+    }
+
+    if (!teochewDict) {
+        fetch(chrome.runtime.getURL(
+            "data/mandarin_teochew.json")).then(
+            r => r.json()).then(
+            r => teochewDict = r);
     }
 
     chrome.tabs.sendMessage(tabId, {
@@ -372,5 +381,19 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
 
         default:
         // ignore
+    }
+});
+
+mozilla.runtime.onMessage.addListener(function (request, sender, response) {
+    switch(request.type) {
+        case 'chaoyin': {
+            let chaoyinArr = lookupChaoyin(request.simpChars, 
+                request.pinyin, teochewDict);
+
+            response({'chaoyinArr': chaoyinArr});
+        }
+            break;
+        
+        default:
     }
 });

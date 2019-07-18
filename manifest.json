@@ -17,6 +17,7 @@
             "all_frames": true,
             "js": [
                 "js/jquery-3.3.1.min.js",
+                "js/browser-polyfill.min.js",
                 "content.js"
             ],
             "matches": [

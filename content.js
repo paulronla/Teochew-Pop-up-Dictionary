@@ -571,7 +571,7 @@ function triggerSearch() {
     return 0;
 }
 
-function processSearchResult(result) {
+async function processSearchResult(result) {
 
     let selStartOffset = savedSelStartOffset;
     let selEndList = savedSelEndList;
@@ -600,7 +600,7 @@ function processSearchResult(result) {
         highlightMatch(doc, rangeNode, selStartOffset, result.matchLen, selEndList);
     }
 
-    showPopup(makeHtml(result, config.tonecolors !== 'no'), savedTarget, popX, popY, false);
+    showPopup(await makeHtml(result, config.tonecolors !== 'no'), savedTarget, popX, popY, false);
 }
 
 // modifies selEndList as a side-effect
@@ -961,7 +961,7 @@ function copyToClipboard(data) {
     showPopup('Copied to clipboard', null, -1, -1);
 }
 
-function makeHtml(result, showToneColors) {
+async function makeHtml(result, showToneColors) {
 
     let entry;
     let html = '';
@@ -972,7 +972,7 @@ function makeHtml(result, showToneColors) {
     if (result === null) return '';
 
     for (let i = 0; i < result.data.length; ++i) {
-        entry = result.data[i][0].match(/^([^\s]+?)\s+([^\s]+?)\s+\[(.*?)\]?\s*<(.*?)>?\s*\/(.+)\//);
+        entry = result.data[i][0].match(/^([^\s]+?)\s+([^\s]+?)\s+\[(.*?)\]?\s*\/(.+)\//);
         if (!entry) continue;
 
         // Hanzi
@@ -1022,9 +1022,15 @@ function makeHtml(result, showToneColors) {
         }
         
         // Chaoyin
+        let chaoyinObj = await mozilla.runtime.sendMessage(
+            {
+                'type': 'chaoyin', 
+                'simpChars': entry[2], 
+                'pinyin': entry[3]
+            });
 
         html += '<span class="' + hanziClass + '">&nbsp;</span>'
-        html += chaoyin(entry[4], showToneColors, pinyinClass);
+        html += chaoyin(chaoyinObj.chaoyinArr, showToneColors, pinyinClass)
         html += '</div>';
 
         // Definition
@@ -1033,7 +1039,7 @@ function makeHtml(result, showToneColors) {
         if (config.fontSize === 'small') {
             defClass += '-small';
         }
-        let translation = entry[5].replace(/\//g, '; ');
+        let translation = entry[4].replace(/\//g, '; ');
         html += '<span class="' + defClass + '">' + translation + '</span><br>';
 
         // Grammar
@@ -1105,9 +1111,8 @@ function tonify(vowels, tone) {
 
 function chaoyin(syllables, showToneColors, pinyinClass) {
     let html = '';
-    let a = syllables.split(/[\s·]+/);
-    for (let i = 0; i < a.length; i++) {
-        let syllable = a[i];
+    for (let i = 0; i < syllables.length; i++) {
+        let syllable = syllables[i];
 
         if (i > 0) {
             html += ' ';
