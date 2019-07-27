@@ -1,0 +1,12 @@
+#zhongwen-window .teochew-ext-btn {
+	display: inline-flex;
+	padding: 0px;
+	line-height: 0.5;
+	width: 1em;
+	justify-content: center;
+}
+
+#zhongwen-window .teochew-ext-btn span {
+	display: flex;
+	align-items: center;
+}

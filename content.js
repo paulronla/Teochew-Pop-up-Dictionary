@@ -673,6 +673,12 @@ function showPopup(html, elem, x, y, looseWidth) {
             tcScheme + '.css'));
         head.appendChild(tc);
 
+        let buttonCss = document.createElement('link');
+        buttonCss.setAttribute('rel', 'stylesheet');
+        buttonCss.setAttribute('type', 'text/css');
+        buttonCss.setAttribute('href', chrome.runtime.getURL('css/popup-button.css'));
+        head.appendChild(buttonCss);
+
         popup = document.createElement('div');
         popup.setAttribute('id', 'zhongwen-window');
         document.documentElement.appendChild(popup);
@@ -1113,6 +1119,7 @@ function chaoyin(syllables, showToneColors, pinyinClass) {
     let html = '';
     for (let i = 0; i < syllables.length; i++) {
         let syllable = syllables[i];
+        let singChaoyinArr = syllable.split('|');
 
         if (i > 0) {
             html += ' ';
@@ -1124,10 +1131,17 @@ function chaoyin(syllables, showToneColors, pinyinClass) {
         } else {
             html += '<span class="' + pinyinClass + '">';
         }
+        for (let j = 0; j < singChaoyinArr.length; j++) {
+            if (j > 0) {
+                html += '|';
+            }
 
-        html += syllable;
+            html += singChaoyinArr[j];
+            html += '<button class="teochew-ext-btn" data-chaoyin="';
+            html += singChaoyinArr[j].split('(')[0];
+            html += '" type="button"><span>▸</span></button>';
+        }
         html += '</span>';
-
     }
     return html;
 }
