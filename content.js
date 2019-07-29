@@ -1139,7 +1139,7 @@ function chaoyin(syllables, showToneColors, pinyinClass) {
             html += singChaoyinArr[j];
             html += '<button class="teochew-ext-btn" data-chaoyin="';
             html += singChaoyinArr[j].split('(')[0];
-            html += '" type="button"><span>▸</span></button>';
+            html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
         }
         html += '</span>';
     }
