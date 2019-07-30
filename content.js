@@ -109,6 +109,7 @@ function disableTab() {
     }
     let zhongwenWindow = document.getElementById('zhongwen-window');
     if (zhongwenWindow) {        
+        zhongwenWindow.removeEventListener('click', playAudio, false);
         zhongwenWindow.parentNode.removeChild(zhongwenWindow);
     }
 
@@ -682,6 +683,8 @@ function showPopup(html, elem, x, y, looseWidth) {
         popup = document.createElement('div');
         popup.setAttribute('id', 'zhongwen-window');
         document.documentElement.appendChild(popup);
+
+        popup.addEventListener('click', playAudio, false);
     }
 
     popup.style.width = 'auto';
@@ -799,6 +802,19 @@ function hidePopup() {
         popup.style.display = 'none';
         popup.textContent = '';
     }
+}
+
+
+function playAudio(event) {
+    if (event.target instanceof HTMLButtonElement 
+            && event.target.classList.contains('teochew-ext-btn')) {
+        
+        chrome.runtime.sendMessage({
+            type: 'playAudio',
+            chaoyin: event.target.dataset.chaoyin
+        });
+    }
+    event.stopPropagation();
 }
 
 function inElem(elem, x, y) {
@@ -1139,8 +1155,8 @@ function chaoyin(syllables, showToneColors, pinyinClass) {
             html += singChaoyinArr[j];
             html += '<button class="teochew-ext-btn" data-chaoyin="';
             html += singChaoyinArr[j].split('(')[0];
-            html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
         }
+        html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
         html += '</span>';
     }
     return html;

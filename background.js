@@ -52,6 +52,8 @@ let isEnabled = localStorage['enabled'] === '1';
 
 let isActivated = false;
 
+let playingAudio = false;
+
 let tabIDs = {};
 
 let dict;
@@ -274,6 +276,10 @@ function search(text) {
     return entry;
 }
 
+function playAudio(chaoyin) {
+    
+}
+
 chrome.browserAction.onClicked.addListener(activateExtensionToggle);
 
 chrome.tabs.onActivated.addListener(activeInfo => enableTab(activeInfo.tabId));
@@ -288,6 +294,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
     let tabID;
 
     switch (request.type) {
+
+        case 'playAudio': {
+            if (!playingAudio) {
+                playingAudio = true;
+                playAudio(request.chaoyin);
+                playingAudio = false;
+            }
+        }
+            break;
 
         case 'search': {
             let e = search(request.text);
@@ -387,7 +402,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
 mozilla.runtime.onMessage.addListener(function (request, sender, response) {
     switch(request.type) {
         case 'chaoyin': {
-            let chaoyinArr = lookupChaoyin(request.simpChars, 
+            const chaoyinArr = lookupChaoyin(request.simpChars, 
                 request.pinyin, teochewDict);
 
             response({'chaoyinArr': chaoyinArr});
