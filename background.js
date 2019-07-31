@@ -60,6 +60,8 @@ let dict;
 
 let teochewDict;
 
+let teochewAudioDict;
+
 let zhongwenOptions = window.zhongwenOptions = {
     css: localStorage['popupcolor'] || 'yellow',
     tonecolors: localStorage['tonecolors'] || 'yes',
@@ -86,6 +88,13 @@ function activateExtension(tabId, showHelp) {
             "data/mandarin_teochew.json")).then(
             r => r.json()).then(
             r => teochewDict = r);
+    }
+
+    if (!teochewAudioDict) {
+        fetch(chrome.runtime.getURL(
+            "data/chaoyin_audio_map.json")).then(
+            r => r.json()).then(
+            r => teochewAudioDict = r);
     }
 
     chrome.tabs.sendMessage(tabId, {
@@ -276,8 +285,15 @@ function search(text) {
     return entry;
 }
 
-function playAudio(chaoyin) {
-    
+async function playAudio(chaoyin) {
+    let mp3URLArr = await loadAudio(chaoyin);
+
+
+}
+
+function loadAudio(chaoyin) {
+    const chaoyinArr = chaoyin.split(' ');
+    const promiseArr = [];
 }
 
 chrome.browserAction.onClicked.addListener(activateExtensionToggle);
@@ -289,7 +305,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
     }
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, response) {
+chrome.runtime.onMessage.addListener(async function (request, sender, response) {
 
     let tabID;
 
@@ -298,7 +314,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
         case 'playAudio': {
             if (!playingAudio) {
                 playingAudio = true;
-                playAudio(request.chaoyin);
+                await playAudio(request.chaoyin);
                 playingAudio = false;
             }
         }
