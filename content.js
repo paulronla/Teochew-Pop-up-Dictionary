@@ -806,15 +806,21 @@ function hidePopup() {
 
 
 function playAudio(event) {
-    if (event.target instanceof HTMLButtonElement 
-            && event.target.classList.contains('teochew-ext-btn')) {
-        
-        chrome.runtime.sendMessage({
-            type: 'playAudio',
-            chaoyin: event.target.dataset.chaoyin
-        });
-    }
     event.stopPropagation();
+    let elem = event.target;
+
+    while (!elem.classList.contains('teochew-ext-btn')) {
+        if (elem === this) {
+            return;
+        }
+        
+        elem = elem.parentNode;
+    }
+
+    chrome.runtime.sendMessage({
+        type: 'playAudio',
+        chaoyin: elem.dataset.chaoyin
+    });
 }
 
 function inElem(elem, x, y) {
@@ -1155,8 +1161,8 @@ function chaoyin(syllables, showToneColors, pinyinClass) {
             html += singChaoyinArr[j];
             html += '<button class="teochew-ext-btn" data-chaoyin="';
             html += singChaoyinArr[j].split('(')[0];
+            html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
         }
-        html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
         html += '</span>';
     }
     return html;

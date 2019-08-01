@@ -56,6 +56,8 @@ let playingAudio = false;
 
 let tabIDs = {};
 
+let reversedMp3URLArr = [];
+
 let dict;
 
 let teochewDict;
@@ -238,6 +240,9 @@ function deactivateExtension() {
 
     chrome.contextMenus.removeAll();
 
+    let player = document.getElementById('teochew-ext-player');
+    player.removeEventListener('ended', playNext, false);
+
     isActivated = false;
 }
 
@@ -285,15 +290,42 @@ function search(text) {
     return entry;
 }
 
-async function playAudio(chaoyin) {
-    let mp3URLArr = await loadAudio(chaoyin);
+async function playAudio(chaoyin, teochewAudioDict) {
+    reversedMp3URLArr = await loadAudio(chaoyin, teochewAudioDict).catch(err => {
+        console.log(err);
+    }) || reversedMp3URLArr;
 
-
+    if (reversedMp3URLArr.length) {
+        const player = document.getElementById('teochew-ext-player');
+        player.src = reversedMp3URLArr[reversedMp3URLArr.length-1];
+        player.play();
+    }
+    else {
+        playingAudio = false;
+    }
 }
 
-function loadAudio(chaoyin) {
+function playNext() {
+    URL.revokeObjectURL(reversedMp3URLArr.pop());
+
+    if (reversedMp3URLArr.length) {
+        const player = document.getElementById('teochew-ext-player');
+        player.src = reversedMp3URLArr[reversedMp3URLArr.length-1];
+        player.play();
+    }
+    else {
+        playingAudio = false;
+    }
+}
+
+function loadAudio(chaoyin, teochewAudioDict) {
     const chaoyinArr = chaoyin.split(' ');
-    const promiseArr = [];
+
+    return Promise.all(chaoyinArr.reverse().map(chaoyin => 
+        fetch(chrome.runtime.getURL('audio/c' + teochewAudioDict[chaoyin] + '.mp3'))
+        .then(res => res.blob())
+        .then(blob => URL.createObjectURL(blob))
+    ));
 }
 
 chrome.browserAction.onClicked.addListener(activateExtensionToggle);
@@ -305,7 +337,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
     }
 });
 
-chrome.runtime.onMessage.addListener(async function (request, sender, response) {
+chrome.runtime.onMessage.addListener(function (request, sender, response) {
 
     let tabID;
 
@@ -314,8 +346,7 @@ chrome.runtime.onMessage.addListener(async function (request, sender, response) 
         case 'playAudio': {
             if (!playingAudio) {
                 playingAudio = true;
-                await playAudio(request.chaoyin);
-                playingAudio = false;
+                playAudio(request.chaoyin, teochewAudioDict);
             }
         }
             break;
@@ -428,3 +459,9 @@ mozilla.runtime.onMessage.addListener(function (request, sender, response) {
         default:
     }
 });
+
+window.onload = function() {
+    const player = document.getElementById('teochew-ext-player');
+
+    player.addEventListener('ended', playNext, false);
+};
