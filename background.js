@@ -291,18 +291,30 @@ function search(text) {
 }
 
 async function playAudio(chaoyin, teochewAudioDict) {
-    reversedMp3URLArr = await loadAudio(chaoyin, teochewAudioDict).catch(err => {
-        console.log(err);
-    }) || reversedMp3URLArr;
+    if (playingAudio) {
+        return;
+    }
+
+    playingAudio = true;
+
+    //on the rare occasion array doesn't get cleared out in playNext callback
+    while (reversedMp3URLArr.length) {
+        URL.revokeObjectURL(reversedMp3URLArr.pop());
+    }
+
+    if (teochewAudioDict) {
+        reversedMp3URLArr = await loadAudio(chaoyin, teochewAudioDict).catch(err => {
+            console.log(err);
+        }) || reversedMp3URLArr;
+    }
 
     if (reversedMp3URLArr.length) {
         const player = document.getElementById('teochew-ext-player');
         player.src = reversedMp3URLArr[reversedMp3URLArr.length-1];
         player.play();
     }
-    else {
-        playingAudio = false;
-    }
+
+    playingAudio = false;
 }
 
 function playNext() {
@@ -312,9 +324,6 @@ function playNext() {
         const player = document.getElementById('teochew-ext-player');
         player.src = reversedMp3URLArr[reversedMp3URLArr.length-1];
         player.play();
-    }
-    else {
-        playingAudio = false;
     }
 }
 
@@ -344,8 +353,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
     switch (request.type) {
 
         case 'playAudio': {
-            if (!playingAudio) {
-                playingAudio = true;
+            if (!reversedMp3URLArr.length 
+                    || document.getElementById('teochew-ext-player').paused) {
                 playAudio(request.chaoyin, teochewAudioDict);
             }
         }
@@ -455,7 +464,11 @@ mozilla.runtime.onMessage.addListener(function (request, sender, response) {
             response({'chaoyinArr': chaoyinArr});
         }
             break;
-        
+
+        case 'audioCheck': {
+            response({'audioExists': audioExists(request.chaoyin, teochewAudioDict)});
+        }
+            break;
         default:
     }
 });

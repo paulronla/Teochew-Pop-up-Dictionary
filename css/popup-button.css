@@ -4,9 +4,14 @@
 	line-height: 0.5;
 	width: 1em;
 	justify-content: center;
+	cursor: default;
 }
 
 #zhongwen-window .teochew-ext-btn-span {
 	display: flex;
 	align-items: center;
+}
+
+#zhongwen-window .teochew-ext-btn * {
+	cursor: default;
 }

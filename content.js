@@ -1015,7 +1015,7 @@ async function makeHtml(result, showToneColors) {
                 hanziClass += '-small';
                 nondefClass += '-small';
             }
-            html += '<div class="' + nondefClass + '">'
+            html += '<div class="' + nondefClass + '">';
             html += '<span class="' + hanziClass + '">' + word + '</span>&nbsp;';
 
         } else {
@@ -1026,7 +1026,7 @@ async function makeHtml(result, showToneColors) {
                 hanziClass += '-small';
                 nondefClass += '-small';
             }
-            html += '<div class="' + nondefClass + '">'
+            html += '<div class="' + nondefClass + '">';
             html += '<span class="' + hanziClass + '">' + entry[2] + '</span>&nbsp;';
             if (entry[1] !== entry[2]) {
                 html += '<span class="' + hanziClass + '">' + entry[1] + '</span>&nbsp;';
@@ -1050,15 +1050,15 @@ async function makeHtml(result, showToneColors) {
         }
         
         // Chaoyin
-        let chaoyinObj = await mozilla.runtime.sendMessage(
+        let {chaoyinArr} = await mozilla.runtime.sendMessage(
             {
                 'type': 'chaoyin', 
                 'simpChars': entry[2], 
                 'pinyin': entry[3]
             });
 
-        html += '<span class="' + hanziClass + '">&nbsp;</span>'
-        html += chaoyin(chaoyinObj.chaoyinArr, showToneColors, pinyinClass)
+        html += '<span class="' + hanziClass + '">&nbsp;</span>';
+        html += await chaoyin(chaoyinArr, showToneColors, pinyinClass);
         html += '</div>';
 
         // Definition
@@ -1137,7 +1137,7 @@ function tonify(vowels, tone) {
     return [html, text];
 }
 
-function chaoyin(syllables, showToneColors, pinyinClass) {
+async function chaoyin(syllables, showToneColors, pinyinClass) {
     let html = '';
     for (let i = 0; i < syllables.length; i++) {
         let syllable = syllables[i];
@@ -1158,10 +1158,18 @@ function chaoyin(syllables, showToneColors, pinyinClass) {
                 html += '|';
             }
 
+            const singChaoyinNoParen = singChaoyinArr[j].split('(')[0];
+            const {audioExists} = await mozilla.runtime.sendMessage({
+                type: 'audioCheck',
+                chaoyin: singChaoyinNoParen
+            });
+
             html += singChaoyinArr[j];
-            html += '<button class="teochew-ext-btn" data-chaoyin="';
-            html += singChaoyinArr[j].split('(')[0];
-            html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
+            if (audioExists) {
+                html += '<button class="teochew-ext-btn" data-chaoyin="';
+                html += singChaoyinNoParen;
+                html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
+            }
         }
         html += '</span>';
     }
