@@ -806,10 +806,11 @@ function hidePopup() {
 
 
 function playAudio(event) {
+    event.preventDefault();
     event.stopPropagation();
     let elem = event.target;
 
-    while (!elem.classList.contains('teochew-ext-btn')) {
+    while (!elem.classList.contains('teochew-ext-play')) {
         if (elem === this) {
             return;
         }
@@ -1139,6 +1140,8 @@ function tonify(vowels, tone) {
 
 async function chaoyin(syllables, showToneColors, pinyinClass) {
     let html = '';
+    const playAllArr = [];
+
     for (let i = 0; i < syllables.length; i++) {
         let syllable = syllables[i];
         let singChaoyinArr = syllable.split('|');
@@ -1154,25 +1157,62 @@ async function chaoyin(syllables, showToneColors, pinyinClass) {
             html += '<span class="' + pinyinClass + '">';
         }
         for (let j = 0; j < singChaoyinArr.length; j++) {
+            let singChaoyin = singChaoyinArr[j];
+            let singChaoyinNoParen = singChaoyin.split('(')[0];
             if (j > 0) {
                 html += '|';
+
+                if (singChaoyin.includes('俗')) {
+                    playAllArr[i] = singChaoyinNoParen;
+                }
+            }
+            else  {
+                playAllArr.push(singChaoyinNoParen);
             }
 
-            const singChaoyinNoParen = singChaoyinArr[j].split('(')[0];
-            const {audioExists} = await mozilla.runtime.sendMessage({
-                type: 'audioCheck',
-                chaoyin: singChaoyinNoParen
-            });
-
-            html += singChaoyinArr[j];
-            if (audioExists) {
-                html += '<button class="teochew-ext-btn" data-chaoyin="';
-                html += singChaoyinNoParen;
-                html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
-            }
+            html += singChaoyin;
+            html += await genTeochewPlayButton(singChaoyinNoParen);
         }
         html += '</span>';
     }
+    html += await genTeochewPlayAllAnchor(playAllArr);
+
+    return html;
+}
+
+async function genTeochewPlayButton(singChaoyinNoParen) {
+    const {audioExists} = await mozilla.runtime.sendMessage({
+        type: 'audioCheck',
+        chaoyin: singChaoyinNoParen
+    });
+    let html = '';
+
+    if (audioExists) {
+        html += '<button class="teochew-ext-play teochew-ext-btn" data-chaoyin="';
+        html += singChaoyinNoParen;
+        html += '" type="button"><span class="teochew-ext-btn-span">▸</span></button>';
+    }
+
+    return html;
+}
+
+async function genTeochewPlayAllAnchor(singChaoyinNoParenArr) {
+    if (singChaoyinNoParenArr.length < 2) {
+        return '';
+    }
+
+    const {playAllStr} = await mozilla.runtime.sendMessage({
+        type: 'playAllAudioCheck',
+        chaoyinArr: singChaoyinNoParenArr
+    });
+    let html = '';
+
+    if (playAllStr) {
+        html += ' <a href="" class="teochew-ext-play teochew-ext-ancr" data-chaoyin="';
+        html += playAllStr;
+        html += '">Play all</a>';
+    }
+    
     return html;
 }
 

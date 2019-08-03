@@ -15,3 +15,8 @@
 #zhongwen-window .teochew-ext-btn * {
 	cursor: default;
 }
+
+#zhongwen-window a.teochew-ext-ancr {
+	color: blue;
+	text-decoration: underline;
+}

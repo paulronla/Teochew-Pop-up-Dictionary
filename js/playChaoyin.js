@@ -20,3 +20,7 @@ function audioExists(chaoyin, teochewAudioDict) {
 
     return audioExists;
 }
+
+function genToneSandhi(chaoyinArr, teochewAudioDict) {
+    return chaoyinArr.join(' ');
+}

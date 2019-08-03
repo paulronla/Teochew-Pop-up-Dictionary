@@ -469,6 +469,11 @@ mozilla.runtime.onMessage.addListener(function (request, sender, response) {
             response({'audioExists': audioExists(request.chaoyin, teochewAudioDict)});
         }
             break;
+
+        case 'playAllAudioCheck': {
+            response({'playAllStr': genToneSandhi(request.chaoyinArr, teochewAudioDict)});
+        }
+            break;
         default:
     }
 });
