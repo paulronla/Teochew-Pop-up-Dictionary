@@ -187,6 +187,9 @@ function activateExtension(tabId, showHelp) {
         }
     );
 
+    let player = document.getElementById('teochew-ext-player');
+    player.addEventListener('ended', playNext, false);
+
     isActivated = true;
 }
 
@@ -477,9 +480,3 @@ mozilla.runtime.onMessage.addListener(function (request, sender, response) {
         default:
     }
 });
-
-window.onload = function() {
-    const player = document.getElementById('teochew-ext-player');
-
-    player.addEventListener('ended', playNext, false);
-};
