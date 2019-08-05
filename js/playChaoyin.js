@@ -16,9 +16,11 @@ const SIMILAR_TONES = {
 };
 
 const SIMILAR_FINALS = {
+    'eng': 'ng',
     'g': 'h',
     'h': 'g',
-    'n': ''
+    'n': '',
+    'ng': 'eng'
 };
 
 function audioExists(chaoyin, teochewAudioDict) {
@@ -36,16 +38,7 @@ function genToneSandhi(chaoyinArr, teochewAudioDict) {
         let tonelessChaoyin = chaoyinArr[i].slice(0, -1);
 
         chaoyinArr[i] = chaoyinIfExists(tonelessChaoyin + newToneNum, teochewAudioDict)
-            || chaoyinIfExists(tonelessChaoyin + 'n' + newToneNum);
-
-        for (const tone in SIMILAR_TONES) {
-            const similarTone = SIMILAR_TONES[tone];
-
-            if (!chaoyinArr[i] && newToneNum === tone) {
-                chaoyinArr[i] = chaoyinIfExists(tonelessChaoyin + similarTone, teochewAudioDict)
-                    || chaoyinIfExists(tonelessChaoyin + 'n' + similarTone);
-            }
-        }
+            || chaoyinIfExists(tonelessChaoyin + 'n' + newToneNum, teochewAudioDict);
 
         for (const final in SIMILAR_FINALS) {
             if (!chaoyinArr[i] && tonelessChaoyin.slice(-final.length) === final) {
@@ -53,6 +46,21 @@ function genToneSandhi(chaoyinArr, teochewAudioDict) {
 
                 chaoyinArr[i] = chaoyinIfExists(similarChaoyin 
                     + newToneNum, teochewAudioDict);
+            }
+        }
+
+        for (const tone in SIMILAR_TONES) {
+            if (!chaoyinArr[i] && newToneNum === tone) {
+                const similarTone = SIMILAR_TONES[tone];
+
+                chaoyinArr[i] = chaoyinIfExists(tonelessChaoyin + similarTone, teochewAudioDict)
+                    || chaoyinIfExists(tonelessChaoyin + 'n' + similarTone, teochewAudioDict);
+            }
+        }
+
+        for (const final in SIMILAR_FINALS) {
+            if (!chaoyinArr[i] && tonelessChaoyin.slice(-final.length) === final) {
+                const similarChaoyin = tonelessChaoyin.slice(0,-final.length) + SIMILAR_FINALS[final];
             
                 for (const tone in SIMILAR_TONES) {
                     if (!chaoyinArr[i] && newToneNum === tone) {
