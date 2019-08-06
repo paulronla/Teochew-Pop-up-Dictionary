@@ -1162,7 +1162,7 @@ async function chaoyin(syllables, showToneColors, pinyinClass) {
             if (j > 0) {
                 html += '|';
 
-                if (singChaoyin.includes('训')) {
+                if (['训','俗'].some(marker => singChaoyin.includes(marker))) {
                     playAllArr[i] = singChaoyinNoParen;
                 }
             }

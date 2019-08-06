@@ -39,6 +39,7 @@
         "contextMenus",
         "tabs"
     ],
+    "content_security_policy": "default-src 'self'",
     "short_name": "Teochew",
     "version": "1.0.0",
     "web_accessible_resources": [
