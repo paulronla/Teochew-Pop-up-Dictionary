@@ -25,7 +25,7 @@
             ]
         }
     ],
-    "description": "Great tool for learning Chinese vocabulary in Teochew.",
+    "description": "Learn Chinese vocabulary in Teochew.",
     "homepage_url": "https://github.com/paulronla/Mandarin-To-Teochew-Mapper",
     "icons": {
         "16": "images/teochew_16.png",
@@ -41,7 +41,7 @@
     ],
     "content_security_policy": "default-src 'self'",
     "short_name": "Teochew",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "web_accessible_resources": [
         "css/*",
         "js/*",

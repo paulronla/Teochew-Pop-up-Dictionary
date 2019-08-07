@@ -1,4 +1,4 @@
-#zhongwen-window, #zhongwen-window * {
+#zhongwen-window, #zhongwen-window * :not(button):not(a) {
   width: auto;
   height: auto;
   background: transparent;

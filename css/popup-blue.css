@@ -1,4 +1,4 @@
-#zhongwen-window, #zhongwen-window * {
+#zhongwen-window, #zhongwen-window * :not(button):not(a) {
   width: auto;
   height: auto;
   background: transparent;
@@ -60,7 +60,7 @@
 }
 
 #zhongwen-window .w-hanzi-small {
-        font-size: 18px;
+  font-size: 18px;
   color: #B7E7FF;
   margin-right: 0.7em;
 }

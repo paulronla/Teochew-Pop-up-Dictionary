@@ -1,4 +1,10 @@
 /*
+ Teochew Pop-up Dictionary
+ Copyright (C) 2019 Paul La
+ https://github.com/paulronla/ 
+ 
+ ---
+
  Zhongwen - A Chinese-English Pop-Up Dictionary
  Copyright (C) 2010-2019 Christian Schiller
  https://chrome.google.com/extensions/detail/kkmlkkjojmombglmlpbpapmhcaljjkde
@@ -32,6 +38,12 @@ function loadVals() {
         document.optform.skritterTLD[1].selected = true;
     } else {
         document.optform.skritterTLD[0].selected = true;
+    }
+
+    if (localStorage['pinyin'] === 'no') {
+        document.optform.pinyin[1].selected = true;
+    } else {
+        document.optform.pinyin[0].selected = true;
     }
 
     if (localStorage['zhuyin'] === 'yes') {
@@ -82,6 +94,9 @@ function storeVals() {
 
     localStorage['skritterTLD'] = document.optform.skritterTLD.value;
     backgroundPage.zhongwenOptions.skritterTLD = localStorage['skritterTLD'];
+
+    localStorage['pinyin'] = document.optform.pinyin.value;
+    backgroundPage.zhongwenOptions.pinyin = localStorage['pinyin'];
 
     localStorage['zhuyin'] = document.optform.zhuyin.value;
     backgroundPage.zhongwenOptions.zhuyin = localStorage['zhuyin'];

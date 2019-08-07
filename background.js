@@ -75,6 +75,7 @@ let zhongwenOptions = window.zhongwenOptions = {
     tonecolors: localStorage['tonecolors'] || 'yes',
     fontSize: localStorage['fontSize'] || 'small',
     skritterTLD: localStorage['skritterTLD'] || 'com',
+    pinyin: localStorage['pinyin'] || 'yes',
     zhuyin: localStorage['zhuyin'] || 'no',
     grammar: localStorage['grammar'] || 'yes',
     simpTrad: localStorage['simpTrad'] || 'classic',
