@@ -5,8 +5,8 @@ A Chrome Extension that displays the Mandarin and Teochew pronunciations for Chi
 ## Screenshots
 
 ![Image from 汕了个头, a Teochew web variety show channel based in Shantou](screenshots/shanlegetou.png)
-*汕了个头 is a Teochew variety show web channel based in Shantou, considered to be 
-the economic capital of the Teochew region*
+*汕了个头 is a Teochew variety show web channel based in Shantou, which is 
+considered to be the economic capital of the Teochew region*
 
 
 ## What is Teochew?
@@ -40,21 +40,95 @@ Mouse over Chinese to bring up the entry in a pop-up.
 
 Each entry shows Simplified Chinese and then Traditional Chinese, if the 
 characters are different, and then the Pinyin and Teochew Romanization 
-with the definition underneath. The layout, including omitting the Pinyin, 
+with the definition underneath. The layout, including omitting Pinyin, 
 can be customized on the options page.
+
+In many cases, a single Chinese character will have many Teochew pronunciations 
+and the correct one for a multi-character word cannot be determined by software. 
+In that scenario, the possible pronunciations are listed together. In order 
+to help with the clutter that may cause, the Teochew pronunciations that belong 
+to a character will be grouped by color. For example, in a three Chinese character 
+word, all pronunciations associated with the first character will be red, with the 
+second character green, and with the third blue.
+
+As it turns out, Teochew can differ from one location to the next where 
+the amount of differences correlate strongly with geographical barriers. 
+The Teochew in this extension is based on the prestige form found in 
+the city center of Shantou and most widely reflects the Teochew spoken 
+worldwide.
 
 ### Teochew Romanization: Peng'im
 
 While Pinyin is the most universally accepted Romanization system for 
 Mandarin, the same level of acceptance has not been attained for Teochew, 
-resulting in inconsistent spellings when speakers discuss phoneticization, 
-even for native speakers in China. On the other hand, professional Teochew 
-linguists and Teochew-Chinese dictionaries use the government backed 
-[Peng'im](https://en.wikipedia.org/wiki/Peng%27im) system, which is the 
-most Pinyin-like compared to other Southern Min Romanization systems.
+resulting in people making up their own systems and inconsistent spellings. 
+Such is so even for most native speakers in China. On the other hand, 
+professional Teochew linguists and Teochew-Chinese dictionaries use the 
+government backed [Peng'im](https://en.wikipedia.org/wiki/Peng%27im) system, 
+which is the most Pinyin-like compared to other Southern Min Romanization 
+systems.
 
-Given that most users will not be initially familiar with Peng'im, every 
-Teochew syllable also has a playable pronunciation. 
+Given that most users aren't familiar with Peng'im, almost every Teochew syllable 
+also has a playable pronunciation. 
+
+### Play All Feature
+
+Like Mandarin, Teochew is tonal but with 
+[8 tones](https://www.teochewdialect.net/tone.php?code=en). Note the tone 
+line graph in the previous link, where the x-axis is time and the y-axis is 
+pitch. Tones 4 and 8 have a shorter duration and sudden stops compared to 
+the other tones. Also note that the tones will change under certain circumstances 
+in a phenomenon known as Tone Sandhi. Generally speaking, tones will change 
+when they're not the last character of a noun or an utterance. The mapping 
+is as follows for the Shantou variant:
+
+Original Tone | New Tone
+------------- | --------
+1 | 1
+2 | 6
+3 | 5
+4 | 8
+5 | 7
+6 | 7
+7 | 7
+8 | 4
+
+To facilitate learning the tone changes, a Play All button when clicked will 
+play the audio for all characters with the tone changes. When a Chinese 
+character has multiple pronunciations, the first pronunciation or a pronunciation 
+marked with 训 or 俗 will be used.
+
+## Vocabulary Differences between Written Chinese and Teochew
+
+In the 1920s, the writing system was reformed from Classical Chinese to Standard 
+Written Chinese, based on spoken Mandarin. Though it is possible to write Chinese 
+mirroring Teochew, this is mostly limited to informal correspondence like in 
+messaging apps. Anything more formal than that will be written in standard Chinese. 
+The important thing to note here is that while grammar is more or less very similar, 
+certain kinds of vocabulary can be different. This comes up more often with daily 
+discussion vocabulary, like pronouns, food, basic verbs, etc, while more intermediate 
+and advanced subjects or abstract ideas use the same Chinese characters (but of course 
+different pronunciations). Here are examples:
+
+English | Mandarin | Teochew
+------- | -------- | -------
+eyes | 眼睛 (yan3 jing1) | 目 (mag8)
+eat | 吃 (chi1) | 食 (ziah8)
+descend | 下 (xia4) | 落 (loh8)
+Japan | 日本 (ri4 ben3) | 日本 (rig8 bung2)
+company | 公司 (gong1 si1) | 公司 (gong1 si1)
+insurance | 保險 (bao3 xian3) | 保險 (bo2 hiam2)
+
+## Goal of Chrome Extension
+
+Given the differences between written Chinese and Teochew, this software 
+does not intend to teach anybody how to speak Teochew. There are already 
+websites and mobile apps that will get you started. Instead, this extension 
+intends to supplement those who already have a Teochew or Chinese background 
+to expand and reinforce their vocabulary when talking with family or if 
+they're studying Mandarin to leverage familiarity from already speaking 
+Teochew. Confirm the correct Teochew pronunciation by asking a family member. 
+My hope is that your Teochew and communication with family will both improve!
 
 ## Legal
 
