@@ -5,7 +5,7 @@ A Chrome Extension that displays the Mandarin and Teochew pronunciations for Chi
 ## Screenshots
 
 ![Image from 汕了个头, a Teochew web variety show channel based in Shantou](screenshots/shanlegetou.png)
-*汕了个头 is a Teochew variety show web channel based in Shantou, which is 
+*汕了个头 is a Teochew variety show web channel based in Shantou, the city  
 considered to be the economic capital of the Teochew region*
 
 
@@ -78,7 +78,7 @@ Like Mandarin, Teochew is tonal but with
 line graph in the previous link, where the x-axis is time and the y-axis is 
 pitch. Tones 4 and 8 have a shorter duration and sudden stops compared to 
 the other tones. Also note that the tones will change under certain circumstances 
-in a phenomenon known as Tone Sandhi. Generally speaking, tones will change 
+in a phenomenon known as Tone Sandhi. Generally speaking, all tones will change 
 when they're not the last character of a noun or an utterance. The mapping 
 is as follows for the Shantou variant:
 
@@ -93,6 +93,8 @@ Original Tone | New Tone
 7 | 7
 8 | 4
 
+Example: computer = 電[diang6](electricity) + 腦[nao2](brain) = 電腦, effectively (diang**7** nao2)
+
 To facilitate learning the tone changes, a Play All button when clicked will 
 play the audio for all characters with the tone changes. When a Chinese 
 character has multiple pronunciations, the first pronunciation or a pronunciation 
@@ -102,13 +104,13 @@ marked with 训 or 俗 will be used.
 
 In the 1920s, the writing system was reformed from Classical Chinese to Standard 
 Written Chinese, based on spoken Mandarin. Though it is possible to write Chinese 
-mirroring Teochew, this is mostly limited to informal correspondence like in 
-messaging apps. Anything more formal than that will be written in standard Chinese. 
-The important thing to note here is that while grammar is more or less very similar, 
-certain kinds of vocabulary can be different. This comes up more often with daily 
-discussion vocabulary, like pronouns, food, basic verbs, etc, while more intermediate 
-and advanced subjects or abstract ideas use the same Chinese characters (but of course 
-different pronunciations). Here are examples:
+mirroring Teochew, this is mostly limited to informal settings like in 
+messaging apps or song lyrics. Anything more formal than that will be written in 
+standard Chinese. The important thing to note here is that while grammar is more or 
+less very similar, certain kinds of vocabulary can be different. This comes up more 
+often with daily discussion vocabulary, like pronouns, food, basic verbs, etc, while 
+more intermediate and advanced subjects or abstract ideas use the same Chinese 
+characters (but of course different pronunciations). Here are examples:
 
 English | Mandarin | Teochew
 ------- | -------- | -------
@@ -127,8 +129,9 @@ websites and mobile apps that will get you started. Instead, this extension
 intends to supplement those who already have a Teochew or Chinese background 
 to expand and reinforce their vocabulary when talking with family or if 
 they're studying Mandarin to leverage familiarity from already speaking 
-Teochew. Confirm the correct Teochew pronunciation by asking a family member. 
-My hope is that your Teochew and communication with family will both improve!
+Teochew. Confirm the correct Teochew pronunciation or character by asking a 
+family member. My hope is that your Teochew and communication with family 
+will both improve!
 
 ## Legal
 

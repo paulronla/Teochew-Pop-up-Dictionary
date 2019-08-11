@@ -542,7 +542,7 @@ function triggerSearch() {
         return 2;
     }
 
-    let u = rangeNode.data.charCodeAt(selStartOffset);
+    let u = rangeNode.data.codePointAt(selStartOffset);
 
     // not a Chinese character
     if (isNaN(u) ||
@@ -550,7 +550,9 @@ function triggerSearch() {
         (u < 0x3400 || 0x9FFF < u) &&
         (u < 0xF900 || 0xFAFF < u) &&
         (u < 0xFF21 || 0xFF3A < u) &&
-        (u < 0xFF41 || 0xFF5A < u))) {
+        (u < 0xFF41 || 0xFF5A < u) &&
+        (u < 0x20000 || 0x2EBEF < u) &&
+        (u < 0x2F800 || 0x2FA1F < u))) {
         clearHighlight();
         hidePopup();
         return 3;
@@ -1056,6 +1058,7 @@ async function makeHtml(result, showToneColors) {
         let {chaoyinArr} = await mozilla.runtime.sendMessage(
             {
                 'type': 'chaoyin', 
+                'tradChars': entry[1],
                 'simpChars': entry[2], 
                 'pinyin': entry[3]
             });

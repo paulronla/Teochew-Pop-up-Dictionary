@@ -469,7 +469,7 @@ mozilla.runtime.onMessage.addListener(function (request, sender, response) {
     switch(request.type) {
         case 'chaoyin': {
             const chaoyinArr = lookupChaoyin(request.simpChars, 
-                request.pinyin, teochewDict);
+                request.tradChars, request.pinyin, teochewDict);
 
             response({'chaoyinArr': chaoyinArr});
         }

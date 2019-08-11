@@ -34,9 +34,10 @@ Number.isInteger = Number.isInteger || function(value) {
         Math.floor(value) === value;
 };
 
-function lookupChaoyin(simpChars, pinyinStr, pinyinChaoyinDict) {
+function lookupChaoyin(simpChars, tradChars, pinyinStr, pinyinChaoyinDict) {
     const pinyinArr = pinyinStr.split(' ');
     const validSimpChars = mapInvalidChars(simpChars);
+    const validTradChars = simpChars.length === validSimpChars.length ? tradChars : mapInvalidChars(tradChars);
     const chaoyinArr = [];
 
     if (!pinyinChaoyinDict || pinyinArr.length > validSimpChars.length) {
@@ -47,8 +48,10 @@ function lookupChaoyin(simpChars, pinyinStr, pinyinChaoyinDict) {
         const char = validSimpChars[i];
         const pinyin = pinyinArr[i].toLowerCase();
 
-        if (pinyinChaoyinDict.hasOwnProperty(char)) {
-            const pinyinChaoyinMapping = pinyinChaoyinDict[char];
+        if (pinyinChaoyinDict.hasOwnProperty(char)
+                || pinyinChaoyinDict.hasOwnProperty(validTradChars[i])) {
+            const pinyinChaoyinMapping = pinyinChaoyinDict[char]
+                    || pinyinChaoyinDict[validTradChars[i]];
 
             if (pinyinChaoyinMapping.hasOwnProperty(pinyin)) {
                 const chaoyin = pinyinChaoyinMapping[pinyin];
