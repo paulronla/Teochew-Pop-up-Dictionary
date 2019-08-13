@@ -43,6 +43,11 @@ const SIMILAR_TONES = {
     '7': '3'
 };
 
+const SIMILAR_INITIALS = {
+    'bh': 'b',
+    'gh': 'g'
+}
+
 const SIMILAR_FINALS = {
     'eng': 'ng',
     'b': 'g',
@@ -61,48 +66,58 @@ function audioExists(chaoyin, teochewAudioDict) {
 }
 
 function genToneSandhi(chaoyinArr, teochewAudioDict) {
-    //last character in an utterance doesn't change tone
-    for (let i = 0; i < chaoyinArr.length - 1; i++) {
-        let newToneNum = TONE_SANDHI[chaoyinArr[i].slice(-1)];
-        let tonelessChaoyin = chaoyinArr[i].slice(0, -1);
+    //last character in utterance doesn't change tone
+    for (let idx = 0; idx < chaoyinArr.length - 1; idx++) {
+        const newToneNum = TONE_SANDHI[chaoyinArr[idx].slice(-1)];
+        const tonelessChaoyin = chaoyinArr[idx].slice(0, -1);
+        chaoyinArr[idx] = undefined;
 
-        chaoyinArr[i] = chaoyinIfExists(tonelessChaoyin + newToneNum, teochewAudioDict)
-            || chaoyinIfExists(tonelessChaoyin + 'n' + newToneNum, teochewAudioDict);
+        for (let sel = 0; sel < 8 && !chaoyinArr[idx]; sel++) {
+            let simTonelessChaoyin = tonelessChaoyin;
+            let simNewToneNum = newToneNum;
 
-        for (const final in SIMILAR_FINALS) {
-            if (!chaoyinArr[i] && tonelessChaoyin.slice(-final.length) === final) {
-                const similarChaoyin = tonelessChaoyin.slice(0,-final.length) + SIMILAR_FINALS[final];
+            for (let i = 0, 
+                    simInitArr = Object.getOwnPropertyNames(SIMILAR_INITIALS); 
+                    !chaoyinArr[idx] && i < ((sel & 4) ? simInitArr.length : 1);
+                    i++) {
+                const initial = simInitArr[i];
+                
+                if ((sel & 4) && simTonelessChaoyin.slice(0, initial.length) === initial) {
+                    simTonelessChaoyin = SIMILAR_INITIALS[initial] 
+                            + simTonelessChaoyin.slice(initial.length);
+                }
 
-                chaoyinArr[i] = chaoyinIfExists(similarChaoyin 
-                    + newToneNum, teochewAudioDict);
-            }
-        }
+                for (let j = 0, 
+                        simToneArr = Object.getOwnPropertyNames(SIMILAR_TONES); 
+                        !chaoyinArr[idx] && j < ((sel & 2) ? simToneArr.length : 1); 
+                        j++) {
+                    const tone = simToneArr[j];
 
-        for (const tone in SIMILAR_TONES) {
-            if (!chaoyinArr[i] && newToneNum === tone) {
-                const similarTone = SIMILAR_TONES[tone];
+                    if ((sel & 2) && simNewToneNum === tone) {
+                        simNewToneNum = SIMILAR_TONES[tone];
+                    }
 
-                chaoyinArr[i] = chaoyinIfExists(tonelessChaoyin + similarTone, teochewAudioDict)
-                    || chaoyinIfExists(tonelessChaoyin + 'n' + similarTone, teochewAudioDict);
-            }
-        }
+                    for (let k = 0, 
+                            simFinArr = Object.getOwnPropertyNames(SIMILAR_FINALS);
+                            !chaoyinArr[idx] && k < ((sel & 1) ? simFinArr.length : 1);
+                            k++) {
+                        const final = simFinArr[k];
+                        
+                        if ((sel & 1) && simTonelessChaoyin.slice(-final.length) === final) {
+                            simTonelessChaoyin = simTonelessChaoyin.slice(0, -final.length) 
+                                    + SIMILAR_FINALS[final];
+                        }
 
-        for (const final in SIMILAR_FINALS) {
-            if (!chaoyinArr[i] && tonelessChaoyin.slice(-final.length) === final) {
-                const similarChaoyin = tonelessChaoyin.slice(0,-final.length) + SIMILAR_FINALS[final];
-            
-                for (const tone in SIMILAR_TONES) {
-                    if (!chaoyinArr[i] && newToneNum === tone) {
-                        const similarTone = SIMILAR_TONES[tone];
-
-                        chaoyinArr[i] = chaoyinIfExists(similarChaoyin 
-                            + similarTone, teochewAudioDict);
+                        chaoyinArr[idx] = chaoyinIfExists(simTonelessChaoyin 
+                                    + simNewToneNum, teochewAudioDict) 
+                                    || chaoyinIfExists(simTonelessChaoyin + 'n' 
+                                    + simNewToneNum, teochewAudioDict);
                     }
                 }
             }
         }
 
-        if (!chaoyinArr[i]) {
+        if (!chaoyinArr[idx]) {
             return '';
         }
     }

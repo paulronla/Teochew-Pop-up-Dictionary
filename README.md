@@ -118,7 +118,7 @@ eyes | 眼睛 (yan3 jing1) | 目 (mag8)
 eat | 吃 (chi1) | 食 (ziah8)
 descend | 下 (xia4) | 落 (loh8)
 Japan | 日本 (ri4 ben3) | 日本 (rig8 bung2)
-company | 公司 (gong1 si1) | 公司 (gong1 si1)
+tooth decay | 蛀牙 (zhu4 ya2) | 蛀牙 (zu3 ghê5)
 insurance | 保險 (bao3 xian3) | 保險 (bo2 hiam2)
 
 ## Goal of Chrome Extension

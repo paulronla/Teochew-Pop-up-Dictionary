@@ -62,3 +62,8 @@ assert.deepStrictEqual(
     genToneSandhi(['uanh4','a1'], teochewAudioDict),
     ''
 );
+
+assert.deepStrictEqual(
+    genToneSandhi(['bhag8','ghêg8','ghao5','a1'], teochewAudioDict),
+    'bag4 gêg4 gao3 a1'
+);
