@@ -655,7 +655,6 @@ function showPopup(html, elem, x, y, looseWidth) {
     let popup = document.getElementById('zhongwen-window');
 
     if (!popup) {
-
         let css = document.createElement('link');
         css.setAttribute('id', 'zhongwen-css');
         css.setAttribute('rel', 'stylesheet');
@@ -665,7 +664,6 @@ function showPopup(html, elem, x, y, looseWidth) {
             theme + '.css'));
 
         let head = document.getElementsByTagName('head')[0];
-        head.appendChild(css);
 
         let tc = document.createElement('link');
         tc.setAttribute('id', 'zhongwen-toneColors');
@@ -674,19 +672,25 @@ function showPopup(html, elem, x, y, looseWidth) {
         let tcScheme = config.toneColorScheme;
         tc.setAttribute('href', chrome.runtime.getURL('css/toneColors-' +
             tcScheme + '.css'));
-        head.appendChild(tc);
 
         let buttonCss = document.createElement('link');
         buttonCss.setAttribute('rel', 'stylesheet');
         buttonCss.setAttribute('type', 'text/css');
         buttonCss.setAttribute('href', chrome.runtime.getURL('css/popup-button.css'));
-        head.appendChild(buttonCss);
 
         popup = document.createElement('div');
         popup.setAttribute('id', 'zhongwen-window');
         document.documentElement.appendChild(popup);
 
         popup.addEventListener('click', playAudio, false);
+        if (customElements) {
+            
+        }
+        else  {
+            head.appendChild(css);
+            head.appendChild(tc);
+            head.appendChild(buttonCss);
+        }
     }
 
     popup.style.width = 'auto';
