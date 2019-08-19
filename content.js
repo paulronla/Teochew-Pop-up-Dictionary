@@ -52,6 +52,9 @@
 
 'use strict';
 
+//global so I don't need to know shadow or non-shadow
+let popup;
+
 let config;
 
 let savedTarget;
@@ -107,12 +110,13 @@ function disableTab() {
     if (zhongwenToneColors) {
         zhongwenToneColors.parentNode.removeChild(zhongwenToneColors);
     }
-    let zhongwenWindow = document.getElementById('zhongwen-window');
+    let zhongwenWindow = popup;
     if (zhongwenWindow) {        
         zhongwenWindow.removeEventListener('click', playAudio, false);
         zhongwenWindow.parentNode.removeChild(zhongwenWindow);
     }
 
+    popup = undefined;
     clearHighlight();
 }
 
@@ -394,8 +398,6 @@ function onMouseMove(mouseMove) {
         }
     }
     
-    let popup = document.getElementById('zhongwen-window');
-    
     if (inElem(popup, mouseMove.clientX, mouseMove.clientY)) {
         return;
     }
@@ -652,8 +654,6 @@ function showPopup(html, elem, x, y, looseWidth) {
         x = y = 0;
     }
 
-    let popup = document.getElementById('zhongwen-window');
-
     if (!popup) {
         let css = document.createElement('link');
         css.setAttribute('id', 'zhongwen-css');
@@ -680,17 +680,26 @@ function showPopup(html, elem, x, y, looseWidth) {
 
         popup = document.createElement('div');
         popup.setAttribute('id', 'zhongwen-window');
-        document.documentElement.appendChild(popup);
-
-        popup.addEventListener('click', playAudio, false);
-        if (customElements) {
+        
+        if (Element.prototype.attachShadow) {
+            const shadowHost = document.createElement('div');
+            shadowHost.setAttribute('id', 'teochew-div-shadowHost');
+            const shadow = shadowHost.attachShadow({mode: 'open'});
             
+            shadow.appendChild(css);
+            shadow.appendChild(tc);
+            shadow.appendChild(buttonCss);
+            shadow.appendChild(popup);
+            document.documentElement.appendChild(shadowHost);
         }
         else  {
             head.appendChild(css);
             head.appendChild(tc);
             head.appendChild(buttonCss);
+            document.documentElement.appendChild(popup);
         }
+
+        popup.addEventListener('click', playAudio, false);
     }
 
     popup.style.width = 'auto';
@@ -803,7 +812,6 @@ function showPopup(html, elem, x, y, looseWidth) {
 }
 
 function hidePopup() {
-    let popup = document.getElementById('zhongwen-window');
     if (popup) {
         popup.style.display = 'none';
         popup.textContent = '';
@@ -907,7 +915,6 @@ function clearHighlight() {
 }
 
 function isVisible() {
-    let popup = document.getElementById('zhongwen-window');
     return popup && popup.style.display !== 'none';
 }
 
