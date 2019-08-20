@@ -2,6 +2,12 @@
 
 A Chrome Extension that displays the Mandarin and Teochew pronunciations for Chinese characters
 
+## Update
+
+\[v. 1.1.0\]
+- Pop-up implemented using Shadow DOM to isolate the play buttons from the web page CSS
+- Dictionary updated with more Standard Chinese words
+
 ## Screenshots
 
 ![Image from 汕了个头, a Teochew web variety show channel based in Shantou](screenshots/shanlegetou.png)
@@ -34,7 +40,11 @@ If Teochew functionality isn't needed at all, please directly use
 Zhongwen for Mandarin learning instead.
 
 Press the \[潮\] button to enable the extension and bring up the mini-help menu. 
+Move the mouse outside the help menu to clear it or hit the \[Esc\] keyboard button.
 Mouse over Chinese to bring up the entry in a pop-up.
+
+For most users, you'll get the most mileage looking up a word in English on a translation 
+website and then mousing over the Chinese characters.
 
 ### Layout
 
