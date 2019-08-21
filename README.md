@@ -103,7 +103,7 @@ Original Tone | New Tone
 7 | 7
 8 | 4
 
-Example: computer = 電[diang6](electricity) + 腦[nao2](brain) = 電腦, effectively (diang**7** nao2)
+Example: computer = 電\[diang6\](electricity) + 腦\[nao2\](brain) = 電腦, effectively (diang**7** nao2)
 
 To facilitate learning the tone changes, a Play All button when clicked will 
 play the audio for all characters with the tone changes. When a Chinese 
