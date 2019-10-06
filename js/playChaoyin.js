@@ -66,6 +66,10 @@ function audioExists(chaoyin, teochewAudioDict) {
 }
 
 function genToneSandhi(chaoyinArr, teochewAudioDict) {
+    if (!audioExists(chaoyinArr[chaoyinArr.length - 1], teochewAudioDict)) {
+        return '';
+    }
+
     //last character in utterance doesn't change tone
     for (let idx = 0; idx < chaoyinArr.length - 1; idx++) {
         const newToneNum = TONE_SANDHI[chaoyinArr[idx].slice(-1)];
