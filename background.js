@@ -92,7 +92,7 @@ function activateExtension(tabId, showHelp) {
         loadDictionary().then(r => dict = r);
     }
 
-    if (!teochewDict) {
+    /*if (!teochewDict) {
         fetch(chrome.runtime.getURL(
             "data/mandarin_teochew.json")).then(
             r => r.json()).then(
@@ -104,7 +104,7 @@ function activateExtension(tabId, showHelp) {
             "data/chaoyin_audio_map.json")).then(
             r => r.json()).then(
             r => teochewAudioDict = r);
-    }
+    }*/
 
     chrome.tabs.sendMessage(tabId, {
         'type': 'enable',
@@ -341,7 +341,8 @@ function loadAudio(chaoyin, teochewAudioDict) {
     const chaoyinArr = chaoyin.split(' ');
 
     return Promise.all(chaoyinArr.reverse().map(chaoyin => 
-        fetch(chrome.runtime.getURL('audio/c' + teochewAudioDict[chaoyin] + '.mp3'))
+        //fetch(chrome.runtime.getURL('audio/c' + teochewAudioDict[chaoyin] + '.mp3'))
+        fetch('http://192.168.99.100:3000/audio/c' + teochewAudioDict[chaoyin] + '.mp3')
         .then(res => res.blob())
         .then(blob => URL.createObjectURL(blob))
     ));
@@ -485,5 +486,25 @@ mozilla.runtime.onMessage.addListener(function (request, sender, response) {
         }
             break;
         default:
+    }
+});
+
+mozilla.runtime.onMessage.addListener(async function (request, sender, response) {
+    switch(request.type) {
+        case 'updateTeochewAssets': {
+            const {pinyinChaoyinDictRes, teochewAudioDictRes} 
+                    = await fetch('http://192.168.99.100:3000/extsearch/'
+                            + request.simpChars + '/' + request.tradChars)
+                            .then(res => res.json())
+                            .catch(err => console.log(err))
+                            || {pinyinChaoyinDictRes: {}, teochewAudioDictRes: {}};
+                            
+
+            teochewDict = pinyinChaoyinDictRes;
+            teochewAudioDict = teochewAudioDictRes;
+
+            response();
+        }
+            break;
     }
 });

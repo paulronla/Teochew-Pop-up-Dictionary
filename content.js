@@ -1013,6 +1013,13 @@ async function makeHtml(result, showToneColors) {
 
     if (result === null) return '';
 
+    entry = result.data[0][0].match(/^([^\s]+?)\s+([^\s]+?)\s+\[(.*?)\]?\s*\/(.+)\//);
+    await mozilla.runtime.sendMessage({
+        'type': 'updateTeochewAssets',
+        'tradChars': entry[1],
+        'simpChars': entry[2]
+    });
+
     for (let i = 0; i < result.data.length; ++i) {
         entry = result.data[i][0].match(/^([^\s]+?)\s+([^\s]+?)\s+\[(.*?)\]?\s*\/(.+)\//);
         if (!entry) continue;
