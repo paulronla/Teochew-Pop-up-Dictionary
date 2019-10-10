@@ -54,6 +54,8 @@
 
 import { ZhongwenDictionary } from './dict.js';
 
+const API_URL = 'https://www.teochewspot.com';
+
 let isEnabled = localStorage['enabled'] === '1';
 
 let isActivated = false;
@@ -66,9 +68,9 @@ let reversedMp3URLArr = [];
 
 let dict;
 
-let teochewDict;
+let teochewDict = {};
 
-let teochewAudioDict;
+let teochewAudioDict = {};
 
 let zhongwenOptions = window.zhongwenOptions = {
     css: localStorage['popupcolor'] || 'yellow',
@@ -87,24 +89,12 @@ function activateExtension(tabId, showHelp) {
     isEnabled = true;
     // values in localStorage are always strings
     localStorage['enabled'] = '1';
+    
+    fetch(API_URL); //wake up service
 
     if (!dict) {
         loadDictionary().then(r => dict = r);
     }
-
-    /*if (!teochewDict) {
-        fetch(chrome.runtime.getURL(
-            "data/mandarin_teochew.json")).then(
-            r => r.json()).then(
-            r => teochewDict = r);
-    }
-
-    if (!teochewAudioDict) {
-        fetch(chrome.runtime.getURL(
-            "data/chaoyin_audio_map.json")).then(
-            r => r.json()).then(
-            r => teochewAudioDict = r);
-    }*/
 
     chrome.tabs.sendMessage(tabId, {
         'type': 'enable',
@@ -341,11 +331,33 @@ function loadAudio(chaoyin, teochewAudioDict) {
     const chaoyinArr = chaoyin.split(' ');
 
     return Promise.all(chaoyinArr.reverse().map(chaoyin => 
-        //fetch(chrome.runtime.getURL('audio/c' + teochewAudioDict[chaoyin] + '.mp3'))
-        fetch('http://192.168.99.100:3000/audio/c' + teochewAudioDict[chaoyin] + '.mp3')
+        fetch(API_URL + '/audio/c' + teochewAudioDict[chaoyin] + '.mp3')
         .then(res => res.blob())
         .then(blob => URL.createObjectURL(blob))
     ));
+}
+
+function filterRepeatedChars(simpChars, tradChars) {
+    const validSimpChars = mapInvalidChars(simpChars);
+    const validTradChars = simpChars.length === validSimpChars.length ? tradChars
+                            : mapInvalidChars(tradChars);
+    const newSimpChars = [];
+    const newTradChars = [];
+
+    for (let i = 0; i < validSimpChars.length; i++) {
+        if (teochewDict.hasOwnProperty(validSimpChars[i])
+                || teochewDict.hasOwnProperty(validTradChars[i])) {
+            continue;
+        }
+        
+        newSimpChars.push(validSimpChars[i]);
+        newTradChars.push(validTradChars[i]);
+    }
+    
+    return  {
+                newSimpChars: newSimpChars.join(''),
+                newTradChars: newTradChars.join('')
+            }
 }
 
 chrome.browserAction.onClicked.addListener(activateExtensionToggle);
@@ -492,16 +504,21 @@ mozilla.runtime.onMessage.addListener(function (request, sender, response) {
 mozilla.runtime.onMessage.addListener(async function (request, sender, response) {
     switch(request.type) {
         case 'updateTeochewAssets': {
-            const {pinyinChaoyinDictRes, teochewAudioDictRes} 
-                    = await fetch('http://192.168.99.100:3000/extsearch/'
-                            + request.simpChars + '/' + request.tradChars)
-                            .then(res => res.json())
-                            .catch(err => console.log(err))
-                            || {pinyinChaoyinDictRes: {}, teochewAudioDictRes: {}};
+            const {newSimpChars, newTradChars} = filterRepeatedChars(request.simpChars, 
+                                                    request.tradChars);
+
+            if (newSimpChars) {
+                const {pinyinChaoyinDictRes, teochewAudioDictRes} 
+                        = await fetch(API_URL + '/extsearch/'
+                                + newSimpChars + '/' + newTradChars)
+                                .then(res => res.json())
+                                .catch(err => console.log(err))
+                                || {pinyinChaoyinDictRes: {}, teochewAudioDictRes: {}};
                             
 
-            teochewDict = pinyinChaoyinDictRes;
-            teochewAudioDict = teochewAudioDictRes;
+                teochewDict = Object.assign(teochewDict, pinyinChaoyinDictRes);
+                teochewAudioDict = Object.assign(teochewAudioDict, teochewAudioDictRes);
+            }
 
             response();
         }

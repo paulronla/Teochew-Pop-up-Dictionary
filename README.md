@@ -4,6 +4,10 @@ A Chrome Extension that displays the Mandarin and Teochew pronunciations for Chi
 
 ## Update
 
+\[v. 2.0.0\]
+- Extension download size reduced by 60%
+- "Play all" bug fixed when final character in a word does not have audio
+
 \[v. 1.1.0\]
 - Pop-up implemented using Shadow DOM to isolate the play buttons from the web page CSS
 - Dictionary updated with more Standard Chinese words

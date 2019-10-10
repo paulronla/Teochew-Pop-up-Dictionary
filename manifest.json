@@ -26,7 +26,6 @@
         }
     ],
     "description": "Learn Chinese vocabulary in Teochew.",
-    "homepage_url": "https://github.com/paulronla/Mandarin-To-Teochew-Mapper",
     "icons": {
         "16": "images/teochew_16.png",
         "48": "images/teochew_48.png",
@@ -37,11 +36,12 @@
     "options_page": "options.html",
     "permissions": [
         "contextMenus",
-        "tabs"
+        "tabs",
+		"https://www.teochewspot.com/"
     ],
-    "content_security_policy": "default-src 'self'",
+    "content_security_policy": "default-src 'self'; connect-src https://www.teochewspot.com/;",
     "short_name": "Teochew",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "web_accessible_resources": [
         "css/*",
         "js/*",
