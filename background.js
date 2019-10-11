@@ -331,7 +331,7 @@ function loadAudio(chaoyin, teochewAudioDict) {
     const chaoyinArr = chaoyin.split(' ');
 
     return Promise.all(chaoyinArr.reverse().map(chaoyin => 
-        fetch(API_URL + '/audio/c' + teochewAudioDict[chaoyin] + '.mp3')
+        fetch(API_URL + '/audio/' + teochewAudioDict[chaoyin] + '.mp3')
         .then(res => res.blob())
         .then(blob => URL.createObjectURL(blob))
     ));
