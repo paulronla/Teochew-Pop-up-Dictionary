@@ -41,7 +41,7 @@
     ],
     "content_security_policy": "default-src 'self'; connect-src https://www.teochewspot.com/;",
     "short_name": "Teochew",
-    "version": "2.0.3",
+    "version": "2.0.4",
     "web_accessible_resources": [
         "css/*",
         "js/*",

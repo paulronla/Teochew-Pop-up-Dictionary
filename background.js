@@ -90,7 +90,7 @@ function activateExtension(tabId, showHelp) {
     // values in localStorage are always strings
     localStorage['enabled'] = '1';
     
-    fetch(API_URL); //wake up service
+    fetch(API_URL + '/extsearch'); //wake up service
 
     if (!dict) {
         loadDictionary().then(r => dict = r);

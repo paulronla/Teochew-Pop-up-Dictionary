@@ -1,6 +1,10 @@
 ![# Teochew-Pop-up-Dictionary](teochew_popup_dict_tile.png)
 
-A Chrome Extension that displays the Mandarin and Teochew pronunciations for Chinese characters
+A Chrome Extension that displays the Mandarin and Teochew pronunciations 
+and English definitions for all Chinese vocabulary and plays back 
+Teochew Text-to-Speech
+
+https://chrome.google.com/webstore/detail/teochew-pop-up-dictionary/jhmfddlpcbhnjmnbkagdaoghacglnmii
 
 ## Update
 
