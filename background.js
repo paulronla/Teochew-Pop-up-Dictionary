@@ -55,6 +55,9 @@
 import { ZhongwenDictionary } from './dict.js';
 
 const API_URL = 'https://www.teochewspot.com';
+const AWS_URL = 'https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws';
+const API_URLS = [API_URL, AWS_URL];
+const LB_API_URLS = [AWS_URL, API_URL, API_URL];
 
 let isEnabled = localStorage['enabled'] === '1';
 
@@ -90,7 +93,7 @@ function activateExtension(tabId, showHelp) {
     // values in localStorage are always strings
     localStorage['enabled'] = '1';
     
-    fetch(API_URL + '/extsearch'); //wake up service
+    API_URLS.forEach(url => fetch(url + '/extsearch')); //wake up services
 
     if (!dict) {
         loadDictionary().then(r => dict = r);
@@ -509,7 +512,7 @@ mozilla.runtime.onMessage.addListener(async function (request, sender, response)
 
             if (newSimpChars) {
                 const {pinyinChaoyinDictRes, teochewAudioDictRes} 
-                        = await fetch(API_URL + '/extsearch/'
+                        = await fetch(LB_API_URLS[Math.floor(Math.random() * LB_API_URLS.length)] + '/extsearch/'
                                 + newSimpChars + '/' + newTradChars)
                                 .then(res => res.json())
                                 .catch(err => console.log(err))

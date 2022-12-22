@@ -37,11 +37,12 @@
     "permissions": [
         "contextMenus",
         "tabs",
-		"https://www.teochewspot.com/"
+		"https://www.teochewspot.com/",
+        "https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws/"
     ],
-    "content_security_policy": "default-src 'self'; connect-src https://www.teochewspot.com/;",
+    "content_security_policy": "default-src 'self'; connect-src https://www.teochewspot.com/ https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws/;",
     "short_name": "Teochew",
-    "version": "2.0.4",
+    "version": "2.1.0",
     "web_accessible_resources": [
         "css/*",
         "js/*",
