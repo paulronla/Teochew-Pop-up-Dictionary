@@ -1,5 +1,8 @@
 {
+    "include": [],
+    "files": [],
     "references": [
-        {"path": "./src/tsconfig-playground.json"}
+        {"path": "./src/tsconfig-playground.json"},
+        {"path": "./src"}
     ]
 }

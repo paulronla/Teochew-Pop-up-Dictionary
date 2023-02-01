@@ -3,5 +3,5 @@
     "compilerOptions": {
         "outDir": "../../js",
     },
-    "exclude": ["playground.tsx"]
+    "exclude": ["../node_modules", "playground.tsx"]
 }

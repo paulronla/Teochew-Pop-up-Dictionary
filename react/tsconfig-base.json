@@ -4,8 +4,13 @@
         "module": "es2022",
         "moduleResolution": "node",
         "composite": true,
-        "declarationDir": "../types",
+        "declarationDir": "types",
+        "typeRoots": [
+            "./node_modules/@types",
+            "./types"
+        ],
         "jsx": "react",
         "allowUmdGlobalAccess": true
-    }
+    },
+    "include": ["src/**/*"]
 }
