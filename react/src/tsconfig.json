@@ -1,7 +1,7 @@
 {
     "extends": "../tsconfig-base",
     "compilerOptions": {
-        "outDir": "../../js",
+        "outDir": "../../js/components",
     },
-    "exclude": ["../node_modules", "playground.tsx"]
+    "exclude": ["playground.tsx"]
 }
