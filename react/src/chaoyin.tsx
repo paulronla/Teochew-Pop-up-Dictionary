@@ -1,9 +1,9 @@
 import TeochewPlayAllAnchor from "./teochew-play-all-anchor";
 import TeochewPlayButton from "./teochew-play-button";
 
-export default function Chaoyin({ syllables, showToneColors, pinyinClass }: 
-    { syllables: string[], showToneColors: boolean, pinyinClass: string }
-) {
+export default function Chaoyin({ syllables, showToneColors, pinyinClass }: {
+    syllables: string[], showToneColors: boolean, pinyinClass: string
+}) {
     const playAllArr: string[] = [];
     const syllablesElems: JSX.Element[] = [];
     syllables.forEach((syllable, i) => {

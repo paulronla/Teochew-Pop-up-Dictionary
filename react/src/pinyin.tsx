@@ -3,20 +3,22 @@ const dict = {
     xx5: "??",
 };
 
-export default function Pinyin({ syllables, showToneColors, pinyinClass }:
-    { syllables: string, showToneColors: boolean, pinyinClass: string }
-) {
+export default function Pinyin({ syllables, showToneColors, pinyinClass }:{
+    syllables: string, showToneColors: boolean, pinyinClass: string
+}) {
     return syllables.split(/[\s·]+/).map((syllable, i) => {
+        const key = syllable + i;
+
         // ',' in pinyin
         if (syllable === ',') {
-            return <React.Fragment key={syllable + i}>{" ,"}</React.Fragment>;
+            return <React.Fragment key={key}>{" ,"}</React.Fragment>;
         }
 
         const spaceElem = (i > 0) ? <>{' '}</> : null;
 
         if (dict.hasOwnProperty(syllable)) {
             return (
-                <PinyinFragment key={syllable + i}
+                <PinyinFragment key={key}
                     spaceElem={spaceElem}
                     className={pinyinClass + showToneColors ? " tone5" : ''}
                 >
@@ -28,7 +30,7 @@ export default function Pinyin({ syllables, showToneColors, pinyinClass }:
         const m = parse(syllable);
         const [t] = tonify(m[2], m[4]);
         return (
-            <PinyinFragment key={syllable + i}
+            <PinyinFragment key={key}
                 spaceElem={spaceElem}
                 className={pinyinClass + showToneColors ? ` tone${m[4]}` : ''}
             >
@@ -39,7 +41,7 @@ export default function Pinyin({ syllables, showToneColors, pinyinClass }:
 }
 
 function PinyinFragment({ spaceElem, className, children }:
-    { key: string, spaceElem: JSX.Element, className: string, children: string }
+    { key: string, spaceElem: JSX.Element, className: string, children: React.ReactNode }
 ) {
     return (
         <>

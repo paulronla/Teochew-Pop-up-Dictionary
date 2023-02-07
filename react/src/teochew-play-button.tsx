@@ -4,7 +4,7 @@ export default function TeochewPlayButton({ singChaoyinNoParen }: { singChaoyinN
     React.useEffect(() => {
         let ignore = false;
         (async () => {
-            const { audioExists: result } : {audioExists: boolean }= await mozilla.runtime.sendMessage({
+            const { audioExists: result }: { audioExists: boolean } = await mozilla.runtime.sendMessage({
                 type: 'audioCheck',
                 chaoyin: singChaoyinNoParen
             });
