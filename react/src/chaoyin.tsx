@@ -30,7 +30,9 @@ export default function Chaoyin({ syllables, showToneColors, pinyinClass }: {
                 <React.Fragment key={singChaoyin + j}>
                     {j > 0 && '|'}
                     {singChaoyin}
-                    <TeochewPlayButton singChaoyinNoParen={singChaoyinNoParen} />
+                    <TeochewPlayButton key={singChaoyinNoParen}
+                        singChaoyinNoParen={singChaoyinNoParen}
+                    />
                 </React.Fragment>
             );
         });
@@ -48,7 +50,9 @@ export default function Chaoyin({ syllables, showToneColors, pinyinClass }: {
     return (
         <>
             {syllablesElems}
-            <TeochewPlayAllAnchor singChaoyinNoParenArr={playAllArr} />
+            <TeochewPlayAllAnchor key={playAllArr.join(' ')}
+                singChaoyinNoParenArr={playAllArr}
+            />
         </>
     );
 }
