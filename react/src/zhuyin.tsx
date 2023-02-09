@@ -414,20 +414,22 @@ const zhuyinMap = {
 };
 
 export default function Zhuyin({ syllables }: { syllables: string }) {
-    return syllables.split(/[\s·]+/).map((syllable, i) => {
-        const toneNum = parse(syllable)[4];
-        const zhuyinClass = config.fontSize === "small" ? "w-zhuyin-small" : "w-zhuyin";
+    return (<>{
+        syllables.split(/[\s·]+/).map((syllable, i) => {
+            const toneNum = parse(syllable)[4];
+            const zhuyinClass = config.fontSize === "small" ? "w-zhuyin-small" : "w-zhuyin";
 
-        return (
-            <React.Fragment key={syllable + i}>
-                {i > 0 && '&nbsp;'}
-                <span className={`tone${toneNum} ${zhuyinClass}`}>
-                    {
-                        zhuyinMap[syllable.slice(0, -1).toLowerCase()] +
-                        zhuyinTones[syllable.slice(-1)]
-                    }
-                </span>
-            </React.Fragment>
-        );
-    });
+            return (
+                <React.Fragment key={syllable + i}>
+                    {i > 0 && <>&nbsp;</>}
+                    <span className={`tone${toneNum} ${zhuyinClass}`}>
+                        {
+                            zhuyinMap[syllable.slice(0, -1).toLowerCase()] +
+                            zhuyinTones[syllable.slice(-1)]
+                        }
+                    </span>
+                </React.Fragment>
+            );
+        })
+    }</>);
 }
