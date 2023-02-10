@@ -18,3 +18,5 @@ declare let config: {
     zhuyin: string,
     grammar: string,
 };
+
+declare let savedSearchResults: [[string, string, string, string, string]];

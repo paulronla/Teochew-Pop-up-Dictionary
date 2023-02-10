@@ -422,11 +422,10 @@ export default function Zhuyin({ syllables }: { syllables: string }) {
             return (
                 <React.Fragment key={syllable + i}>
                     {i > 0 && <>&nbsp;</>}
-                    <span className={`tone${toneNum} ${zhuyinClass}`}>
-                        {
-                            zhuyinMap[syllable.slice(0, -1).toLowerCase()] +
-                            zhuyinTones[syllable.slice(-1)]
-                        }
+                    <span className={`tone${toneNum} ${zhuyinClass}`}>{
+                        zhuyinMap[syllable.slice(0, -1).toLowerCase()] +
+                        zhuyinTones[syllable.slice(-1)]
+                    }
                     </span>
                 </React.Fragment>
             );
