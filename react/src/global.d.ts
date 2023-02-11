@@ -19,4 +19,8 @@ declare let config: {
     grammar: string,
 };
 
-declare let savedSearchResults: [[string, string, string, string, string]];
+// extension originally assigns an array and sets named property "grammar" on it
+declare let savedSearchResults: {
+    [idx: number]: [string, string, string, string, string],
+    grammar?: { keyword: string, index: number }
+};

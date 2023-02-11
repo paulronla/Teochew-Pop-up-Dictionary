@@ -9,7 +9,14 @@ export default function ReactPopup({ result, showToneColors }: {
     showToneColors: boolean
 }) {
     const [isUpdated, setIsUpdated] = React.useState(false);
-    const texts: [[string, string, string, string, string]?] = [];
+    const texts: React.MutableRefObject<[[string, string, string, string, string]?]> = React.useRef([]);
+
+    React.useEffect(() => {
+        if (result !== null && isUpdated) {
+            savedSearchResults = texts.current;
+            savedSearchResults.grammar = result.grammar;
+        }
+    }, [result, isUpdated, texts]);
 
     if (result === null) return;
 
@@ -24,7 +31,7 @@ export default function ReactPopup({ result, showToneColors }: {
                     showToneColors={showToneColors}
                     grammarIdx={result.grammar?.index}
                     idx={i}
-                    texts={texts}
+                    texts={texts.current}
                 />
             )
         }
