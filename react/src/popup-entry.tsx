@@ -1,6 +1,6 @@
-import Pinyin from "./pinyin";
-import Zhuyin from "./zhuyin";
-import Chaoyin from "./chaoyin";
+import Pinyin from "./pinyin.js";
+import Zhuyin from "./zhuyin.js";
+import Chaoyin from "./chaoyin.js";
 
 export default function PopupEntry({ dentry, word, showToneColors, grammarIdx, idx, texts }: {
     dentry: string,

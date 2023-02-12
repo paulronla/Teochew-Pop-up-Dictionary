@@ -1,5 +1,5 @@
-import TeochewPlayAllAnchor from "./teochew-play-all-anchor";
-import TeochewPlayButton from "./teochew-play-button";
+import TeochewPlayAllAnchor from "./teochew-play-all-anchor.js";
+import TeochewPlayButton from "./teochew-play-button.js";
 
 export default function Chaoyin({ syllables, showToneColors, pinyinClass }: {
     syllables: string[], showToneColors: boolean, pinyinClass: string

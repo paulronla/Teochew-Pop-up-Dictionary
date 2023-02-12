@@ -20,7 +20,11 @@ declare let config: {
 };
 
 // extension originally assigns an array and sets named property "grammar" on it
-declare let savedSearchResults: {
+interface savedSearchResults {
     [idx: number]: [string, string, string, string, string],
     grammar?: { keyword: string, index: number }
-};
+}
+
+interface Window {
+    savedSearchResults: savedSearchResults
+}
