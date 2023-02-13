@@ -21,7 +21,7 @@ export default function Pinyin({ syllables, showToneColors, pinyinClass }:{
                 return (
                     <PinyinFragment key={key}
                         spaceElem={spaceElem}
-                        className={pinyinClass + showToneColors ? " tone5" : ''}
+                        className={pinyinClass + (showToneColors ? " tone5" : '')}
                     >
                         {dict[syllable]}
                     </PinyinFragment>
@@ -29,11 +29,11 @@ export default function Pinyin({ syllables, showToneColors, pinyinClass }:{
             }
 
             const m = parse(syllable);
-            const [t] = tonify(m[2], m[4]);
+            const [, t] = tonify(m[2], m[4]);
             return (
                 <PinyinFragment key={key}
                     spaceElem={spaceElem}
-                    className={pinyinClass + showToneColors ? ` tone${m[4]}` : ''}
+                    className={pinyinClass + (showToneColors ? ` tone${m[4]}` : '')}
                 >
                     {m[1] + t + m[3]}
                 </PinyinFragment>
