@@ -60,37 +60,33 @@ export default function PopupEntry({ dentry, word, showToneColors, grammarIdx, i
 
     texts[idx] = [simpChars, tradChars, text, translation, pinyin];
 
-    return (
-        <PopupEntryWrapper tradChars={tradChars} simpChars={simpChars} pinyin={pinyin} setState={setState}>{
-            didEffectRun && (
-            <>
-                <div className={nondefClass}>
-                    {hanziElems}
-                    <Pinyin syllables={entry[3]} showToneColors={showToneColors} pinyinClass={pinyinClass} />
-                    {config.zhuyin !== "yes" && chaoyinElems}
-                </div>
-                {config.zhuyin === "yes" && (
-                <div className={nondefClass}>
-                    <Zhuyin syllables={entry[3]} />
-                    {chaoyinElems}
-                </div>)}
-                <span className={defClass}>{translation}</span><br />
-                {grammar}
-            </>)
-        }
-        </PopupEntryWrapper>
-    );
+    return (<>
+        <PopupEntryEffect tradChars={tradChars} simpChars={simpChars} pinyin={pinyin} setState={setState} />
+        {didEffectRun && (<>
+        <div className={nondefClass}>
+            {hanziElems}
+            <Pinyin syllables={entry[3]} showToneColors={showToneColors} pinyinClass={pinyinClass} />
+            {config.zhuyin !== "yes" && chaoyinElems}
+        </div>
+        {config.zhuyin === "yes" && (
+        <div className={nondefClass}>
+            <Zhuyin syllables={entry[3]} />
+            {chaoyinElems}
+        </div>)}
+        <span className={defClass}>{translation}</span><br />
+        {grammar}
+        </>)}
+    </>);
 }
 
-function PopupEntryWrapper({ tradChars, simpChars, pinyin, setState, children }: {
+function PopupEntryEffect({ tradChars, simpChars, pinyin, setState }: {
     tradChars: string,
     simpChars: string,
     pinyin: string,
     setState: React.Dispatch<React.SetStateAction<{
         didEffectRun: boolean;
         chaoyinArr: any[];
-    }>>,
-    children: React.ReactNode
+    }>>
 }) {
     React.useEffect(() => {
         let ignore = false;
@@ -110,5 +106,5 @@ function PopupEntryWrapper({ tradChars, simpChars, pinyin, setState, children }:
         return () => {ignore = true;};
     }, [tradChars, simpChars, pinyin, setState]);
 
-    return <>{children}</>;
+    return null;
 }

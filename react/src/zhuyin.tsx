@@ -1,3 +1,23 @@
+export default function Zhuyin({ syllables }: { syllables: string }) {
+    return (<>{
+        syllables.split(/[\s·]+/).map((syllable, i) => {
+            const toneNum = parse(syllable)[4];
+            const zhuyinClass = config.fontSize === "small" ? "w-zhuyin-small" : "w-zhuyin";
+
+            return (
+                <React.Fragment key={syllable + i}>
+                    {i > 0 && <>&nbsp;</>}
+                    <span className={`tone${toneNum} ${zhuyinClass}`}>{
+                        zhuyinMap[syllable.slice(0, -1).toLowerCase()] +
+                        zhuyinTones[syllable.slice(-1)]
+                    }
+                    </span>
+                </React.Fragment>
+            );
+        })
+    }</>);
+}
+
 const zhuyinTones = ['?', '', '\u02CA', '\u02C7', '\u02CB', '\u30FB'];
 
 const zhuyinMap = {
@@ -412,23 +432,3 @@ const zhuyinMap = {
     'zun': '\u3117\u3128\u3123',
     'zuo': '\u3117\u3128\u311b'
 };
-
-export default function Zhuyin({ syllables }: { syllables: string }) {
-    return (<>{
-        syllables.split(/[\s·]+/).map((syllable, i) => {
-            const toneNum = parse(syllable)[4];
-            const zhuyinClass = config.fontSize === "small" ? "w-zhuyin-small" : "w-zhuyin";
-
-            return (
-                <React.Fragment key={syllable + i}>
-                    {i > 0 && <>&nbsp;</>}
-                    <span className={`tone${toneNum} ${zhuyinClass}`}>{
-                        zhuyinMap[syllable.slice(0, -1).toLowerCase()] +
-                        zhuyinTones[syllable.slice(-1)]
-                    }
-                    </span>
-                </React.Fragment>
-            );
-        })
-    }</>);
-}
