@@ -13,6 +13,7 @@ export default function PopupLayoutWrapper({ elem, xPnt, yPnt, children }: {
     children: React.ReactNode
 }) {
     React.useLayoutEffect(() => {
+        let ignore = false;
         const html = $(popup).html();
         let x: number;
         let y: number;
@@ -112,11 +113,13 @@ export default function PopupLayoutWrapper({ elem, xPnt, yPnt, children }: {
         }
     
         // (-1, -1) indicates: leave position unchanged
-        if (x !== -1 && y !== -1) {
+        if (x !== -1 && y !== -1 && !ignore) {
             popup.style.left = x + 'px';
             popup.style.top = y + 'px';
             popup.style.display = 'table';
         }
+
+        return () => {ignore = true;};
     }, [elem, xPnt, yPnt]);
 
     return <>{children}</>;
