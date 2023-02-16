@@ -94,15 +94,21 @@ export default function PopupLayoutWrapper({ elem, xPnt, yPnt, children }: {
                     let t = y - pH - savedLineHeight - 5;
                     if (t >= 0) {
                         y = t;
-                        popupAboveMouse = true;
+                        if (!ignore) {
+                            popupAboveMouse = true;
+                        }
                     }
                 }
                 else { 
                     y += v;
-                    popupAboveMouse = false;
+                    if (!ignore) {
+                        popupAboveMouse = false;
+                    }
                 }
                 
-                savedDY = y - clientY;
+                if (!ignore) {
+                    savedDY = y - clientY;
+                }
     
                 x += window.scrollX;
                 y += window.scrollY;
@@ -120,7 +126,7 @@ export default function PopupLayoutWrapper({ elem, xPnt, yPnt, children }: {
         }
 
         return () => {ignore = true;};
-    }, [elem, xPnt, yPnt]);
+    });
 
     return <>{children}</>;
 }
