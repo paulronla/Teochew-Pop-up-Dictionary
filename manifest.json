@@ -20,6 +20,7 @@
                 "js/browser-polyfill.min.js",
                 "js/react.production.js",
                 "js/react-dom.production.js",
+                "js/html-react-parser.min.js",
                 "content.js"
             ],
             "matches": [
