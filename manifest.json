@@ -18,8 +18,8 @@
             "js": [
                 "js/jquery-3.3.1.min.js",
                 "js/browser-polyfill.min.js",
-                "js/react.production.js",
-                "js/react-dom.production.js",
+                "js/react.production.min.js",
+                "js/react-dom.production.min.js",
                 "js/html-react-parser.min.js",
                 "content.js"
             ],

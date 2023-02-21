@@ -1,5 +1,7 @@
 import TeochewPlayAllAnchor from "./teochew-play-all-anchor.js";
 import TeochewPlayButton from "./teochew-play-button.js";
+import PopupLayoutEffect from "./popup-layout-effect.js";
+import CountPendingPromise from "./count-pending-promise.js";
 
 export default function Chaoyin({ syllables, showToneColors, pinyinClass }: {
     syllables: string[], showToneColors: boolean, pinyinClass: string
@@ -32,6 +34,8 @@ export default function Chaoyin({ syllables, showToneColors, pinyinClass }: {
                     {singChaoyin}
                     <TeochewPlayButton key={singChaoyinNoParen}
                         singChaoyinNoParen={singChaoyinNoParen}
+                        cntPromiseComp={<CountPendingPromise />}
+                        layoutEffectComp={<PopupLayoutEffect />}
                     />
                 </React.Fragment>
             );
@@ -52,6 +56,8 @@ export default function Chaoyin({ syllables, showToneColors, pinyinClass }: {
             {syllablesElems}
             <TeochewPlayAllAnchor key={playAllArr.join(' ')}
                 singChaoyinNoParenArr={playAllArr}
+                cntPromiseComp={<CountPendingPromise />}
+                layoutEffectComp={<PopupLayoutEffect />}
             />
         </>
     );

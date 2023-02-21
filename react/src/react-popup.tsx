@@ -1,5 +1,5 @@
 import PopupEntry from "./popup-entry.js";
-import PopupLayoutWrapper from "./popup-layout-wrapper.js";
+import PopupProviderWrapper from "./popup-provider-wrapper.js";
 
 export default function ReactPopup({ result, showToneColors, elem, x, y }: {
     result: { 
@@ -28,7 +28,7 @@ export default function ReactPopup({ result, showToneColors, elem, x, y }: {
     return (<>
         <PopupEntriesEffect result={result} setIsUpdated={setIsUpdated} />
         {isUpdated && (
-        <PopupLayoutWrapper elem={elem} xPnt={x} yPnt={y}>
+        <PopupProviderWrapper elem={elem} xPnt={x} yPnt={y}>
             {result.data.map(([dentry, word], i) => 
             <PopupEntry key={dataJoins[i] + i}
                 dentry={dentry}
@@ -38,7 +38,7 @@ export default function ReactPopup({ result, showToneColors, elem, x, y }: {
                 idx={i}
                 texts={texts.current}
             />)}
-        </PopupLayoutWrapper>
+        </PopupProviderWrapper>
         )}
         {result.more && <>&hellip;<br /></>}
     </>);

@@ -19,6 +19,8 @@ declare let config: {
     grammar: string,
 };
 
+declare let popup: HTMLElement;
+
 // extension originally assigns an array and sets named property "grammar" on it
 interface savedSearchResults {
     [idx: number]: [string, string, string, string, string],

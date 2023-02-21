@@ -1,4 +1,8 @@
-export default function TeochewPlayAllAnchor({ singChaoyinNoParenArr }: { singChaoyinNoParenArr : string[] }) {
+export default function TeochewPlayAllAnchor({ singChaoyinNoParenArr, cntPromiseComp, layoutEffectComp }: {
+    singChaoyinNoParenArr : string[],
+    cntPromiseComp?: React.ReactNode,
+    layoutEffectComp?: React.ReactNode
+}) {
     const [playAllStr, setPlayAllStr] = React.useState("");
     
     React.useEffect(() => {
@@ -23,13 +27,16 @@ export default function TeochewPlayAllAnchor({ singChaoyinNoParenArr }: { singCh
         return;
     }
 
-    return playAllStr && (
-        <a 
-            href=""
-            className="teochew-ext-play teochew-ext-ancr"
-            data-chaoyin={ playAllStr }
-        >
-            Play all
-        </a>
-    );
+    return playAllStr ? (
+        <>
+            <a 
+                href=""
+                className="teochew-ext-play teochew-ext-ancr"
+                data-chaoyin={ playAllStr }
+            >
+                Play all
+            </a>
+            {layoutEffectComp}
+        </>
+    ) : <>{cntPromiseComp}</>;
 }
