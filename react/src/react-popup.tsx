@@ -1,6 +1,12 @@
 import PopupEntry from "./popup-entry.js";
 import PopupProviderWrapper from "./popup-provider-wrapper.js";
 
+// extension originally assigns an array and sets named property "grammar" on it
+declare let savedSearchResults: {
+    [idx: number]: [string, string, string, string, string],
+    grammar?: { keyword: string, index: number }
+};
+
 export default function ReactPopup({ result, showToneColors, elem, x, y }: {
     result: { 
         data: [[string, string]],
@@ -19,8 +25,8 @@ export default function ReactPopup({ result, showToneColors, elem, x, y }: {
 
     React.useEffect(() => {
         if (result !== null && isUpdated) {
-            window.savedSearchResults = texts.current;
-            window.savedSearchResults.grammar = result.grammar;
+            savedSearchResults = texts.current;
+            savedSearchResults.grammar = result.grammar;
         }
     }, [result, isUpdated, texts]);
 

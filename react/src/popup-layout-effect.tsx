@@ -1,6 +1,7 @@
 import { ElemPropContext, XPntContext, YPntContext, PromiseCntContext } from "./contexts.js";
 
 declare const $: any;
+declare let triggerRerender: () => void;
 declare let altView: number;
 declare let savedLineHeight: number;
 declare let popupAboveMouse: boolean;
@@ -12,6 +13,7 @@ export default function PopupLayoutEffect() {
     const xPnt = React.useContext(XPntContext);
     const yPnt = React.useContext(YPntContext);
     const promiseCnt = React.useContext(PromiseCntContext);
+    const altView = React.useSyncExternalStore(subscribeAltView, getAltView);
 
     React.useEffect(() => {
         let ignore = false;
@@ -20,10 +22,10 @@ export default function PopupLayoutEffect() {
             promiseCnt.current--;
         }
 
-        if (promiseCnt.current === 0) {
+        if (promiseCnt.current <= 0) {
             const html = $(popup).html();
-            let x: number;
-            let y: number;
+            let x = xPnt;
+            let y = yPnt;
         
             if (elem) {
                 if (!ignore) {
@@ -81,8 +83,6 @@ export default function PopupLayoutEffect() {
                         x += (elem.parentNode as HTMLElement).offsetWidth + 5;
                     }
                 } else {
-                    x = xPnt;
-                    y = yPnt;
                     // go left if necessary
                     if (x + pW > window.innerWidth - 20) {
                         x = (window.innerWidth - pW) - 20;
@@ -136,7 +136,17 @@ export default function PopupLayoutEffect() {
         }
 
         return () => {ignore = true;};
-    }, [elem, promiseCnt, xPnt, yPnt]);
+    }, [altView, elem, promiseCnt, xPnt, yPnt]);
 
     return null;
+}
+
+function subscribeAltView(onStoreChange: () => void) {
+    triggerRerender = onStoreChange;
+
+    return () => {triggerRerender = undefined;};
+}
+
+function getAltView() {
+    return altView;
 }

@@ -24,7 +24,7 @@ export default function PopupEntry({ dentry, word, showToneColors, grammarIdx, i
     const hanziElems = (
         <>
             <span className={hanziClass}>{config.simpTrad === "auto" ? word : entry[2]}</span>&nbsp;
-            {config.simpTrad !== "auto " && entry[1] !== entry[2] && (<>
+            {config.simpTrad !== "auto" && entry[1] !== entry[2] && (<>
             <span className={hanziClass}>{entry[1]}</span>&nbsp;</>)}
         </>
     );
@@ -65,7 +65,8 @@ export default function PopupEntry({ dentry, word, showToneColors, grammarIdx, i
         {didEffectRun && (<>
         <div className={nondefClass}>
             {hanziElems}
-            <Pinyin syllables={entry[3]} showToneColors={showToneColors} pinyinClass={pinyinClass} />
+            {config.pinyin === "yes" &&
+            <Pinyin syllables={entry[3]} showToneColors={showToneColors} pinyinClass={pinyinClass} />}
             {config.zhuyin !== "yes" && chaoyinElems}
         </div>
         {config.zhuyin === "yes" && (
