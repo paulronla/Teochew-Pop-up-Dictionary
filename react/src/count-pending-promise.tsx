@@ -3,7 +3,7 @@ import { PromiseCntContext } from "./contexts.js";
 export default function CountPendingPromise() {
     const promiseCnt = React.useContext(PromiseCntContext);
 
-    React.useLayoutEffect(() => {
+    React.useEffect(() => {
         let ignore = false;
         if (!ignore) {
             promiseCnt.current++;

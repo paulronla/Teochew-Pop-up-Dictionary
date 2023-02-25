@@ -15,6 +15,8 @@ export default function ReactPopup({ result, showToneColors, elem, x, y }: {
     const [isUpdated, setIsUpdated] = React.useState(false);
     const texts: React.MutableRefObject<[[string, string, string, string, string]?]> = React.useRef([]);
 
+    React.useEffect(() => { popup.style.display = "none"; }, []);
+
     React.useEffect(() => {
         if (result !== null && isUpdated) {
             window.savedSearchResults = texts.current;

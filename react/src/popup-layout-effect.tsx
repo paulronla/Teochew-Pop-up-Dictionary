@@ -13,7 +13,7 @@ export default function PopupLayoutEffect() {
     const yPnt = React.useContext(YPntContext);
     const promiseCnt = React.useContext(PromiseCntContext);
 
-    React.useLayoutEffect(() => {
+    React.useEffect(() => {
         let ignore = false;
 
         if (!ignore) {
@@ -136,7 +136,7 @@ export default function PopupLayoutEffect() {
         }
 
         return () => {ignore = true;};
-    }, []);
+    }, [elem, promiseCnt, xPnt, yPnt]);
 
     return null;
 }
