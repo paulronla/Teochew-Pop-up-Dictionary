@@ -15,7 +15,7 @@ export default function PopupEntry({ dentry, word, showToneColors, grammarIdx, i
 
     if (!entry) return;
 
-    const [, tradChars, simpChars, pinyin, english] = entry;
+    const [, tradChars, simpChars, numTonedPinyin, english] = entry;
     const nondefClass = config.fontSize === "small" ? "w-nondef-small" : "w-nondef";
 
     // Hanzi
@@ -23,16 +23,16 @@ export default function PopupEntry({ dentry, word, showToneColors, grammarIdx, i
     const hanziClass = config.fontSize === "small" ? "w-hanzi-small" : "w-hanzi";
     const hanziElems = (
         <>
-            <span className={hanziClass}>{config.simpTrad === "auto" ? word : entry[2]}</span>&nbsp;
-            {config.simpTrad !== "auto" && entry[1] !== entry[2] && (<>
-            <span className={hanziClass}>{entry[1]}</span>&nbsp;</>)}
+            <span className={hanziClass}>{config.simpTrad === "auto" ? word : simpChars}</span>&nbsp;
+            {config.simpTrad !== "auto" && tradChars !== simpChars && (<>
+            <span className={hanziClass}>{tradChars}</span>&nbsp;</>)}
         </>
     );
 
     // Pinyin
 
     const pinyinClass = config.fontSize === "small" ? "w-pinyin-small" : "w-pinyin";
-    const [, text] = pinyinAndZhuyin(entry[3], showToneColors, pinyinClass);
+    const tonedPinyin = genTonedPinyin(numTonedPinyin);
 
     // Chaoyin
 
@@ -58,20 +58,24 @@ export default function PopupEntry({ dentry, word, showToneColors, grammarIdx, i
         </>
     );
 
-    texts[idx] = [simpChars, tradChars, text, translation, pinyin];
+    texts[idx] = [simpChars, tradChars, tonedPinyin, translation, numTonedPinyin];
 
     return (<>
-        <PopupEntryEffect tradChars={tradChars} simpChars={simpChars} pinyin={pinyin} setState={setState} />
+        <PopupEntryEffect tradChars={tradChars} simpChars={simpChars} pinyin={numTonedPinyin} setState={setState} />
         {didEffectRun && (<>
         <div className={nondefClass}>
             {hanziElems}
             {config.pinyin === "yes" &&
-            <Pinyin syllables={entry[3]} showToneColors={showToneColors} pinyinClass={pinyinClass} />}
+            <Pinyin numTonedSyllables={numTonedPinyin}
+                showToneColors={showToneColors}
+                pinyinClass={pinyinClass}
+                tonedSyllables={tonedPinyin}
+            />}
             {config.zhuyin !== "yes" && chaoyinElems}
         </div>
         {config.zhuyin === "yes" && (
         <div className={nondefClass}>
-            <Zhuyin syllables={entry[3]} />
+            <Zhuyin numTonedSyllables={numTonedPinyin} />
             {chaoyinElems}
         </div>)}
         <span className={defClass}>{translation}</span><br />

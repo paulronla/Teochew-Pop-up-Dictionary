@@ -3,11 +3,13 @@ const dict = {
     xx5: "??",
 };
 
-export default function Pinyin({ syllables, showToneColors, pinyinClass }:{
-    syllables: string, showToneColors: boolean, pinyinClass: string
+export default function Pinyin({ numTonedSyllables, showToneColors, pinyinClass, tonedSyllables }: {
+    numTonedSyllables: string, showToneColors: boolean, pinyinClass: string, tonedSyllables: string
 }) {
+    const tonedSyllableList = tonedSyllables.split(/[\s·]+/);
+
     return (<>{
-        syllables.split(/[\s·]+/).map((syllable, i) => {
+        numTonedSyllables.split(/[\s·]+/).map((syllable, i) => {
             const key = syllable + i;
 
             // ',' in pinyin
@@ -29,13 +31,12 @@ export default function Pinyin({ syllables, showToneColors, pinyinClass }:{
             }
 
             const m = parse(syllable);
-            const [, t] = tonify(m[2], m[4]);
             return (
                 <PinyinFragment key={key}
                     spaceElem={spaceElem}
                     className={pinyinClass + (showToneColors ? ` tone${m[4]}` : '')}
                 >
-                    {m[1] + t + m[3]}
+                    {tonedSyllableList[i]}
                 </PinyinFragment>
             );
         })

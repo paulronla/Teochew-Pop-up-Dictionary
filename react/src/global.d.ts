@@ -8,8 +8,7 @@ declare const mozilla: {
 };
 
 declare function parse(s: string): string[];
-declare function tonify(vowels: string, tone: string): [string, string];
-declare function pinyinAndZhuyin(syllables: string, showToneColors: boolean, pinyinClass: string): [string, string, string]
+declare function genTonedPinyin(syllables: string): string
 
 declare let config: {
     fontSize: string,

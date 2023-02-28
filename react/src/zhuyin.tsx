@@ -1,6 +1,6 @@
-export default function Zhuyin({ syllables }: { syllables: string }) {
+export default function Zhuyin({ numTonedSyllables }: { numTonedSyllables: string }) {
     return (<>{
-        syllables.split(/[\s·]+/).map((syllable, i) => {
+        numTonedSyllables.split(/[\s·]+/).map((syllable, i) => {
             const toneNum = parse(syllable)[4];
             const zhuyinClass = config.fontSize === "small" ? "w-zhuyin-small" : "w-zhuyin";
 

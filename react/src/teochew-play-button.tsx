@@ -4,6 +4,7 @@ export default function TeochewPlayButton({ singChaoyinNoParen, cntPromiseComp, 
     layoutEffectComp?: React.ReactNode
 }) {
     const [audioExists, setAudioExists] = React.useState(false);
+    const [promiseResolved, setPromiseResolved] = React.useState(false);
 
     React.useEffect(() => {
         let ignore = false;
@@ -15,14 +16,16 @@ export default function TeochewPlayButton({ singChaoyinNoParen, cntPromiseComp, 
 
             if (!ignore) {
                 setAudioExists(result);
+                setPromiseResolved(true);
             }
         })();
 
         return () => { ignore = true; };
     }, [singChaoyinNoParen]);
 
-    return audioExists ? (
+    return (
         <>
+            {audioExists && (
             <button 
                 className="teochew-ext-play teochew-ext-btn"
                 data-chaoyin={ singChaoyinNoParen }
@@ -30,7 +33,8 @@ export default function TeochewPlayButton({ singChaoyinNoParen, cntPromiseComp, 
             >
                 <span className="teochew-ext-btn-span">▸</span>
             </button>
-            {layoutEffectComp}
+            )}
+            {promiseResolved ? layoutEffectComp : cntPromiseComp}
         </>
-    ) : <>{cntPromiseComp}</>;
+    );
 }

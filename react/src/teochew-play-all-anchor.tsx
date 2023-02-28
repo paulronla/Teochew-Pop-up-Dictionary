@@ -4,6 +4,7 @@ export default function TeochewPlayAllAnchor({ singChaoyinNoParenArr, cntPromise
     layoutEffectComp?: React.ReactNode
 }) {
     const [playAllStr, setPlayAllStr] = React.useState("");
+    const [promiseResolved, setPromiseResolved] = React.useState(false);
     
     React.useEffect(() => {
         if (singChaoyinNoParenArr.length >= 2) {
@@ -16,6 +17,7 @@ export default function TeochewPlayAllAnchor({ singChaoyinNoParenArr, cntPromise
 
                 if (!ignore) {
                     setPlayAllStr(result);
+                    setPromiseResolved(true);
                 }
             })();
 
@@ -27,8 +29,9 @@ export default function TeochewPlayAllAnchor({ singChaoyinNoParenArr, cntPromise
         return;
     }
 
-    return playAllStr ? (
+    return (
         <>
+            {playAllStr && (
             <a 
                 href=""
                 className="teochew-ext-play teochew-ext-ancr"
@@ -36,7 +39,8 @@ export default function TeochewPlayAllAnchor({ singChaoyinNoParenArr, cntPromise
             >
                 Play all
             </a>
-            {layoutEffectComp}
+            )}
+            {promiseResolved ? layoutEffectComp : cntPromiseComp}
         </>
-    ) : <>{cntPromiseComp}</>;
+    );
 }
