@@ -3,6 +3,7 @@
     "files": [],
     "references": [
         {"path": "./src/tsconfig-playground.json"},
-        {"path": "./src"}
+        {"path": "./src"},
+        {"path": "./tests/src"},
     ]
 }
