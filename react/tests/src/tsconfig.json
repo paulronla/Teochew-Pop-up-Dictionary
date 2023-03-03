@@ -5,6 +5,7 @@
         "outDir": "../built",
         "module": "node16",
         "moduleResolution": "node16",
+        "declarationDir": "../types"
     },
     "include": ["**/*"]
 }
