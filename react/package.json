@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc -b",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "npx tsc -b && node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "author": "",
   "license": "ISC",
