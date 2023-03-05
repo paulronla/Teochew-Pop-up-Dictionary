@@ -52,8 +52,26 @@
 
 'use strict';
 
+let ReactPopup;
+let PopupProviderWrapper;
+let PopupLayoutEffect;
+(async () => {
+    const modules = await Promise.all([
+        import('./js/components/react-popup.js'),
+        import('./js/components/popup-provider-wrapper.js'),
+        import('./js/components/popup-layout-effect.js')
+    ]);
+    ReactPopup = modules[0].default;
+    PopupProviderWrapper = modules[1].default;
+    PopupLayoutEffect = modules[2].default;
+})();
+
 //global so I don't need to know shadow or non-shadow
 let popup;
+
+let reactRoot;
+
+let triggerRerender;
 
 let config;
 
@@ -116,6 +134,13 @@ function disableTab() {
         zhongwenWindow.parentNode.removeChild(zhongwenWindow);
     }
 
+    let shadow = document.getElementById('teochew-div-shadowHost');
+    if (shadow) {
+        shadow.parentNode.removeChild(shadow);
+    }
+
+    reactRoot?.unmount();
+    reactRoot = undefined;
     popup = undefined;
     clearHighlight();
 }
@@ -150,6 +175,7 @@ function onKeyDown(keyDown) {
         case 65: // 'a'
             altView = (altView + 1) % 3;
             triggerSearch();
+            triggerRerender && triggerRerender();
             break;
 
         case 67: // 'c'
@@ -605,7 +631,14 @@ async function processSearchResult(result) {
         highlightMatch(doc, rangeNode, selStartOffset, result.matchLen, selEndList);
     }
 
-    showPopup(await makeHtml(result, config.tonecolors !== 'no'), savedTarget, popX, popY, false);
+    showPopup(React.createElement(ReactPopup, {
+        result,
+        showToneColors: config.tonecolors !== 'no',
+        elem: savedTarget,
+        x: popX,
+        y: popY,
+        key: result?.data.map(datum => datum.join(' ')).join(' ')
+    }), savedTarget, popX, popY, false);
 }
 
 // modifies selEndList as a side-effect
@@ -654,6 +687,14 @@ function showPopup(html, elem, x, y, looseWidth) {
         x = y = 0;
     }
 
+    const reactElems = typeof html === "string" ? 
+        React.createElement(PopupProviderWrapper, {
+            elem: elem,
+            xPnt: x,
+            yPnt: y
+        }, HTMLReactParser(html), React.createElement(PopupLayoutEffect))
+        : html;
+
     if (!popup) {
         let css = document.createElement('link');
         css.setAttribute('id', 'zhongwen-css');
@@ -680,6 +721,8 @@ function showPopup(html, elem, x, y, looseWidth) {
 
         popup = document.createElement('div');
         popup.setAttribute('id', 'zhongwen-window');
+
+        reactRoot = ReactDOM.createRoot(popup);
         
         if (Element.prototype.attachShadow) {
             const shadowHost = document.createElement('div');
@@ -709,112 +752,13 @@ function showPopup(html, elem, x, y, looseWidth) {
     let popupMaxWidth = parseInt(popup.style.maxWidth, 10);
     popup.style.maxWidth = Math.min(Number.isNaN(popupMaxWidth) ? window.innerWidth : popupMaxWidth, (1.5*window.innerWidth) > window.innerHeight ? Math.floor(window.innerWidth/3) : window.innerWidth);
 
-    $(popup).html(html);
-
-    if (elem) {
-        popup.style.top = '-1000px';
-        popup.style.left = '0px';
-        popup.style.display = 'table';
-
-        let pW = popup.offsetWidth;
-        let pH = popup.offsetHeight;
-
-        if (pW <= 0) {
-            pW = 200;
-        }
-        if (pH <= 0) {
-            pH = 0;
-            let j = 0;
-            while ((j = html.indexOf('<br/>', j)) !== -1) {
-                j += 5;
-                pH += 22;
-            }
-            pH += 25;
-        }
-
-        if (altView === 1) {
-            x = window.scrollX;
-            y = window.scrollY;
-        } else if (altView === 2) {
-            x = (window.innerWidth - (pW + 20)) + window.scrollX;
-            y = (window.innerHeight - (pH + 20)) + window.scrollY;
-        } else if (elem instanceof window.HTMLOptionElement) {
-
-            x = 0;
-            y = 0;
-
-            let p = elem;
-            while (p) {
-                x += p.offsetLeft;
-                y += p.offsetTop;
-                p = p.offsetParent;
-            }
-
-            if (elem.offsetTop > elem.parentNode.clientHeight) {
-                y -= elem.offsetTop;
-            }
-
-            if (x + popup.offsetWidth > window.innerWidth) {
-                // too much to the right, go left
-                x -= popup.offsetWidth + 5;
-                if (x < 0) {
-                    x = 0;
-                }
-            } else {
-                // use SELECT's width
-                x += elem.parentNode.offsetWidth + 5;
-            }
-        } else {
-            // go left if necessary
-            if (x + pW > window.innerWidth - 20) {
-                x = (window.innerWidth - pW) - 20;
-            }
-            else {
-                x -= Math.floor(pW/3);
-            }
-            
-            if (x < 0) {
-                x = 0;
-            }
-
-            // below the mouse
-            let v = 0;
-
-            // go up if necessary
-            if (y + v + pH > window.innerHeight) {
-                let t = y - pH - savedLineHeight - 5;
-                if (t >= 0) {
-                    y = t;
-					popupAboveMouse = true;
-                }
-            }
-            else { 
-				y += v;
-				popupAboveMouse = false;
-			}
-            
-            savedDY = y - clientY;
-
-            x += window.scrollX;
-            y += window.scrollY;
-        }
-    } else {
-        x += window.scrollX;
-        y += window.scrollY;
-    }
-
-    // (-1, -1) indicates: leave position unchanged
-    if (x !== -1 && y !== -1) {
-        popup.style.left = x + 'px';
-        popup.style.top = y + 'px';
-        popup.style.display = 'table';
-    }
+    reactRoot.render(reactElems);
 }
 
 function hidePopup() {
     if (popup) {
         popup.style.display = 'none';
-        popup.textContent = '';
+        reactRoot.render();
     }
 }
 
@@ -1298,6 +1242,36 @@ function pinyinAndZhuyin(syllables, showToneColors, pinyinClass) {
             + zhuyinTones[syllable[syllable.length - 1]] + '</span>';
     }
     return [html, text, zhuyin];
+}
+
+function genTonedPinyin(syllables) {
+    let text = '';
+    let a = syllables.split(/[\s·]+/);
+    for (let i = 0; i < a.length; i++) {
+        let syllable = a[i];
+
+        // ',' in pinyin
+        if (syllable === ',') {
+            text += ' ,';
+            continue;
+        }
+
+        if (i > 0) {
+            text += ' ';
+        }
+        if (syllable === 'r5') {
+            text += 'r';
+            continue;
+        }
+        if (syllable === 'xx5') {
+            text += '??';
+            continue;
+        }
+        let m = parse(syllable);
+        let t = tonify(m[2], m[4]);
+        text += m[1] + t[1] + m[3];
+    }
+    return text;
 }
 
 let zhuyinTones = ['?', '', '\u02CA', '\u02C7', '\u02CB', '\u30FB'];
