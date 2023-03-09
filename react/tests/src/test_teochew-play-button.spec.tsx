@@ -16,11 +16,15 @@ const mozilla = require("browser");
 globalThis.mozilla = mozilla;
 
 describe("test_teochew-play-button", () => {
+    let TeochewPlayButton;
+    beforeAll(async () => {
+        const module = await import('../../../js/components/teochew-play-button.js');
+        return TeochewPlayButton = module.default;
+    });
+    
     it("renders a play button", async () => {
-        const { default: TeochewPlayButton } = await import('../../../js/components/teochew-play-button.js');
-
         const { findByText } = render(<TeochewPlayButton singChaoyinNoParen={"chaoyin"} />);
 
-        await findByText("▸");
+        return await findByText("▸");
     });
 });

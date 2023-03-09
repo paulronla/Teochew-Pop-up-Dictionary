@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, waitForElementToBeRemoved } from '@testing-library/react';
 import * as React from 'react';
 globalThis.React = React;
 
@@ -16,11 +16,18 @@ const mozilla = require("browser");
 globalThis.mozilla = mozilla;
 
 describe("test_teochew-play-all-anchor", () => {
-    it("renders the play all anchor", async () => {
-        const { default: TeochewPlayAllAnchor } = await import('../../../js/components/teochew-play-all-anchor.js');
-
-        const { findByText } = render(<TeochewPlayAllAnchor singChaoyinNoParenArr={["chaoyin1", "chaoyin2"]} />);
-
+    let TeochewPlayAllAnchor;
+    beforeAll(async () => {
+        const module = await import('../../../js/components/teochew-play-all-anchor.js');
+        return TeochewPlayAllAnchor = module.default;
+    });
+    
+    it("renders the play all anchor and clears for one word", async () => {
+        const { getByText, findByText, rerender } = render(<TeochewPlayAllAnchor singChaoyinNoParenArr={["chaoyin1", "chaoyin2"]} />);
         await findByText("Play all");
+
+        const promise = waitForElementToBeRemoved(getByText("Play all"));
+        rerender(<TeochewPlayAllAnchor singChaoyinNoParenArr={["chaoyin1"]} />);
+        return await promise;
     });
 });
