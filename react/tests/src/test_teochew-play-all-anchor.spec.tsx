@@ -30,4 +30,18 @@ describe("test_teochew-play-all-anchor", () => {
         rerender(<TeochewPlayAllAnchor singChaoyinNoParenArr={["chaoyin1"]} />);
         return await promise;
     });
+
+    it("first renders cntPromiseComp only and then layoutEffectComp only", async () => {
+        const { findByText, getByText, queryByText } = render(
+            <TeochewPlayAllAnchor singChaoyinNoParenArr={["c1", "c2"]} cntPromiseComp={"cntPromiseComp"} layoutEffectComp={"layoutEffectComp"} />
+        );
+
+        getByText("cntPromiseComp");
+        expect(queryByText("layoutEffectComp")).toBeNull();
+
+        const promise = await findByText("layoutEffectComp");
+        expect(queryByText("cntPromiseComp")).toBeNull();
+
+        return promise;
+    });
 });
