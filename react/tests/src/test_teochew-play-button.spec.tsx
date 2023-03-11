@@ -7,7 +7,7 @@ jest.mock("browser", () => {
         __esModule: true,
         runtime: {
             sendMessage: jest.fn(
-                () => Promise.resolve({ audioExists: true })
+                ({ chaoyin }) => Promise.resolve({ audioExists: chaoyin === "chaoyin" })
             )
         }
     }
@@ -35,9 +35,11 @@ describe("test_teochew-play-button", () => {
 
         getByText("cntPromiseComp");
         expect(queryByText("layoutEffectComp")).toBeNull();
+        expect(queryByText("▸")).toBeNull();
 
         const promise = await findByText("layoutEffectComp");
         expect(queryByText("cntPromiseComp")).toBeNull();
+        expect(queryByText("▸")).toBeNull();
 
         return promise;
     });
