@@ -1,4 +1,4 @@
-import { render, waitForElementToBeRemoved } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import * as React from 'react';
 globalThis.React = React;
 
