@@ -10,7 +10,7 @@ globalThis.parse = (syllable: string) => {
 }
 
 globalThis.config = {
-    zhuyin: "yes",
+    fontSize: "small",
 };
 
 describe("test_zhuyin", () => {
