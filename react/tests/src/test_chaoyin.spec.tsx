@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
 import * as React from 'react';
 import * as $ from '../../../js/jquery-3.3.1.min.js';
+import { jest } from '@jest/globals';
 globalThis.React = React;
 globalThis.$ = $;
 
@@ -21,8 +22,18 @@ mozilla.runtime.sendMessage.mockImplementation(({ type }: { type: string}) => {
     }
 });
 
-jest.mock("../../../js/components/popup-layout-effect.js", () => "PopupLayoutEffect");
-jest.mock("../../../js/components/count-pending-promise.js", () => "CountPendingPromise");
+jest.unstable_mockModule("../../../js/components/popup-layout-effect.js", () => {
+    return {
+        __esModule: true,
+        default: () => null,
+    };
+});
+jest.unstable_mockModule("../../../js/components/count-pending-promise.js", () => {
+    return {
+        __esModule: true,
+        default: () => null,
+    };
+});
 
 describe("test_chaoyin", () => {
     let Chaoyin;
@@ -31,11 +42,10 @@ describe("test_chaoyin", () => {
         return Chaoyin = module.default;
     });
 
-    // TODO: debug test
-    /*it("renders Chaoyin", async () => {
+    it("renders Chaoyin", async () => {
         const { container, findByText } = render(<Chaoyin syllables={["le2", "ho2"]} />);
 
         await findByText("Play all");
         expect(container.textContent.match(/le2▸ ho2▸/g).length).toBe(1);
-    });*/
+    });
 });
