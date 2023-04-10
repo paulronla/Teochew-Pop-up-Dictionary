@@ -26,6 +26,19 @@ mozilla.runtime.sendMessage.mockImplementation(({ type, pinyin }: { type: string
     }
 });
 
+globalThis.genTonedPinyin = (syllables: string) => {
+    switch(syllables) {
+        case "ni3 hao3": return "nǐ hǎo";
+        case "ni3": return "nǐ";
+    }
+}
+globalThis.parse = (syllable: string) => {
+    switch (syllable) {
+        case "ni3": return ["ni3", 'n', 'i', '', '3'];
+        case "hao3": return ["hao3", 'h', "ao", '', '3'];
+    }
+}
+
 jest.unstable_mockModule("../../../js/components/popup-layout-effect.js", () => {
     return {
         __esModule: true,
@@ -39,6 +52,11 @@ jest.unstable_mockModule("../../../js/components/count-pending-promise.js", () =
     };
 });
 
+globalThis.config = {
+    pinyin: "yes",
+    zhuyin: "yes",
+};
+
 describe("test_popup-entry", () => {
     let PopupEntry;
     beforeAll(async () => {
@@ -46,7 +64,14 @@ describe("test_popup-entry", () => {
         return PopupEntry = module.default;
     });
 
-    it("renders a PopupEntry", () => {
-        //const { findByText } = render(<PopupEntry  />)
+    it("renders a PopupEntry", async () => {
+        const { findByText } = render(<PopupEntry
+            dentry={"你好 你好 [ni3 hao3] /hello/"}
+            word={"你好"}
+            idx={0}
+            texts={[]}
+            />);
+
+        await findByText("Play all");
     });
 });
