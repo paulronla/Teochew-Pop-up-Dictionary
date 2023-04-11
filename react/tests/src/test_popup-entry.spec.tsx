@@ -21,7 +21,7 @@ mozilla.runtime.sendMessage.mockImplementation(({ type, pinyin }: { type: string
         case "playAllAudioCheck": return Promise.resolve({ playAllStr: "le6 ho2" });
         case "chaoyin": return Promise.resolve({
             chaoyinArr: pinyin.split(' ')
-                .map((_, i) => ["le2", "ho2(白)|hoh4(白)|haon3|hao2(文)"][i])
+                .map((_, i) => ["le2", "ho2"][i])
         });
     }
 });
@@ -65,7 +65,7 @@ describe("test_popup-entry", () => {
     });
 
     it("renders a PopupEntry", async () => {
-        const { findByText } = render(<PopupEntry
+        const { container, getByText, findByText } = render(<PopupEntry
             dentry={"你好 你好 [ni3 hao3] /hello/"}
             word={"你好"}
             idx={0}
@@ -73,5 +73,9 @@ describe("test_popup-entry", () => {
             />);
 
         await findByText("Play all");
+        expect(container.textContent.match(/nǐ hǎo/g).length).toBe(1);
+        expect(container.textContent.match(/ㄋㄧˇ\u00a0ㄏㄠˇ/g).length).toBe(1);
+        expect(container.textContent.match(/le2▸ ho2▸/g).length).toBe(1);
+        getByText("hello");
     });
 });
