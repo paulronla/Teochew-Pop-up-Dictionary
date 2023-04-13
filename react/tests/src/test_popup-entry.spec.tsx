@@ -55,6 +55,7 @@ jest.unstable_mockModule("../../../js/components/count-pending-promise.js", () =
 globalThis.config = {
     pinyin: "yes",
     zhuyin: "yes",
+    grammar: "yes",
 };
 
 describe("test_popup-entry", () => {
@@ -65,17 +66,28 @@ describe("test_popup-entry", () => {
     });
 
     it("renders a PopupEntry", async () => {
-        const { container, getByText, findByText } = render(<PopupEntry
+        const { container, getByText, findByText, queryByText, rerender } = render(<PopupEntry
             dentry={"你好 你好 [ni3 hao3] /hello/"}
             word={"你好"}
             idx={0}
             texts={[]}
-            />);
+        />);
 
         await findByText("Play all");
         expect(container.textContent.match(/nǐ hǎo/g).length).toBe(1);
         expect(container.textContent.match(/ㄋㄧˇ\u00a0ㄏㄠˇ/g).length).toBe(1);
         expect(container.textContent.match(/le2▸ ho2▸/g).length).toBe(1);
         getByText("hello");
+        expect(queryByText('Press "g" for grammar and usage notes.')).toBeNull();
+
+        rerender(<PopupEntry
+            dentry={"你好 你好 [ni3 hao3] /hello/"}
+            word={"你好"}
+            idx={0}
+            grammarIdx={0}
+            texts={[]}
+        />);
+        
+        return await findByText('Press "g" for grammar and usage notes.');
     });
 });
