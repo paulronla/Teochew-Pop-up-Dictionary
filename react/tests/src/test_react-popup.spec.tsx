@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { genTonedPinyin, parse } from './stubs/stubs.js';
 import * as React from 'react';
 import * as $ from '../../../js/jquery-3.3.1.min.js';
 globalThis.React = React;
@@ -25,18 +26,8 @@ mozilla.runtime.sendMessage.mockImplementation(({ type, pinyin }: { type: string
     }
 });
 globalThis.mozilla = mozilla;
-globalThis.genTonedPinyin = (syllables: string) => {
-    switch(syllables) {
-        case "ni3 hao3": return "nǐ hǎo";
-        case "ni3": return "nǐ";
-    }
-}
-globalThis.parse = (syllable: string) => {
-    switch (syllable) {
-        case "ni3": return ["ni3", 'n', 'i', '', '3'];
-        case "hao3": return ["hao3", 'h', "ao", '', '3'];
-    }
-}
+globalThis.genTonedPinyin = genTonedPinyin;
+globalThis.parse = parse;
 globalThis.savedSearchResults = [];
 globalThis.altView = 0;
 globalThis.popupAboveMouse = false;

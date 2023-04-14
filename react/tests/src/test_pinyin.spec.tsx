@@ -1,19 +1,10 @@
 import { render } from '@testing-library/react';
+import { genTonedPinyin, parse } from './stubs/stubs.js';
 import * as React from 'react';
 globalThis.React = React;
 
-globalThis.genTonedPinyin = (syllables: string) => {
-    switch(syllables) {
-        case "ni3 hao3": return "nǐ hǎo";
-        case "ni3": return "nǐ";
-    }
-}
-globalThis.parse = (syllable: string) => {
-    switch (syllable) {
-        case "ni3": return ["ni3", 'n', 'i', '', '3'];
-        case "hao3": return ["hao3", 'h', "ao", '', '3'];
-    }
-}
+globalThis.genTonedPinyin = genTonedPinyin;
+globalThis.parse = parse;
 
 globalThis.config = {
     fontSize: "small",

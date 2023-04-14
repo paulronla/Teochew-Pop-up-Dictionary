@@ -1,13 +1,9 @@
 import { render } from '@testing-library/react';
+import { parse } from './stubs/stubs.js'; 
 import * as React from 'react';
 globalThis.React = React;
 
-globalThis.parse = (syllable: string) => {
-    switch (syllable) {
-        case "ni3": return ["ni3", 'n', 'i', '', '3'];
-        case "hao3": return ["hao3", 'h', "ao", '', '3'];
-    }
-}
+globalThis.parse = parse;
 
 globalThis.config = {
     fontSize: "small",
