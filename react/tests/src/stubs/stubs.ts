@@ -11,3 +11,10 @@ export const parse = (syllable: string) => {
         case "hao3": return ["hao3", 'h', "ao", '', '3'];
     }
 }
+
+export const config = {
+    pinyin: "yes",
+    zhuyin: "yes",
+    grammar: "yes",
+    fontSize: "small",
+}

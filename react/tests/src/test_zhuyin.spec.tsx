@@ -1,13 +1,11 @@
 import { render } from '@testing-library/react';
-import { parse } from './stubs/stubs.js'; 
+import { parse, config } from './stubs/stubs.js'; 
 import * as React from 'react';
 globalThis.React = React;
 
 globalThis.parse = parse;
 
-globalThis.config = {
-    fontSize: "small",
-};
+globalThis.config = config;
 
 describe("test_zhuyin", () => {
     let Zhuyin;

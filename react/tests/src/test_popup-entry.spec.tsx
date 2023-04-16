@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { genTonedPinyin, parse } from './stubs/stubs.js';
+import { genTonedPinyin, parse, config } from './stubs/stubs.js';
 import * as React from 'react';
 import * as $ from '../../../js/jquery-3.3.1.min.js';
 import { jest } from '@jest/globals';
@@ -43,11 +43,7 @@ jest.unstable_mockModule("../../../js/components/count-pending-promise.js", () =
     };
 });
 
-globalThis.config = {
-    pinyin: "yes",
-    zhuyin: "yes",
-    grammar: "yes",
-};
+globalThis.config = config;
 
 describe("test_popup-entry", () => {
     let PopupEntry;

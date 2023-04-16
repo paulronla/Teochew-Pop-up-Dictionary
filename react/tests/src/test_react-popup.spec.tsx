@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import { genTonedPinyin, parse } from './stubs/stubs.js';
+import { genTonedPinyin, parse, config } from './stubs/stubs.js';
 import * as React from 'react';
 import * as $ from '../../../js/jquery-3.3.1.min.js';
 globalThis.React = React;
@@ -33,10 +33,7 @@ globalThis.altView = 0;
 globalThis.popupAboveMouse = false;
 globalThis.clientY = 0;
 globalThis.savedDY = 0;
-globalThis.config = {
-    pinyin: "yes",
-    zhuyin: "yes",
-};
+globalThis.config = config;
 
 describe("test_react-popup", () => {
     it("renders a popup", async () => {
