@@ -1,11 +1,10 @@
 import { render } from '@testing-library/react';
 import { genTonedPinyin, parse, config } from './stubs/stubs.js';
 import * as React from 'react';
-globalThis.React = React;
 
+globalThis.React = React;
 globalThis.genTonedPinyin = genTonedPinyin;
 globalThis.parse = parse;
-
 globalThis.config = config;
 
 describe("test_pinyin", () => {

@@ -1,10 +1,9 @@
 import { render } from '@testing-library/react';
 import { parse, config } from './stubs/stubs.js'; 
 import * as React from 'react';
+
 globalThis.React = React;
-
 globalThis.parse = parse;
-
 globalThis.config = config;
 
 describe("test_zhuyin", () => {

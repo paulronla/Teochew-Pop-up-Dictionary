@@ -1,26 +1,12 @@
 import { render } from '@testing-library/react';
+import { simpMozilla } from './stubs/mocks.js';
 import * as React from 'react';
 import * as $ from '../../../js/jquery-3.3.1.min.js';
 import { jest } from '@jest/globals';
+
 globalThis.React = React;
 globalThis.$ = $;
-
-jest.mock("browser", () => {
-    return {
-        __esModule: true,
-        runtime: {
-            sendMessage: jest.fn()
-        }
-    }
-}, { virtual: true });
-const mozilla = require("browser");
-globalThis.mozilla = mozilla;
-mozilla.runtime.sendMessage.mockImplementation(({ type }: { type: string}) => {
-    switch(type) {
-        case "audioCheck": return Promise.resolve({ audioExists: true });
-        case "playAllAudioCheck": return Promise.resolve({ playAllStr: "le6 ho2" });
-    }
-});
+globalThis.mozilla = simpMozilla;
 
 jest.unstable_mockModule("../../../js/components/popup-layout-effect.js", () => {
     return {
