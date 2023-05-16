@@ -58,6 +58,14 @@ const API_URL = 'https://www.teochewspot.com';
 const AWS_URL = 'https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws';
 const API_URLS = [API_URL, AWS_URL];
 const LB_API_URLS = [AWS_URL, API_URL, API_URL];
+const GRAPHQL_QUERY = `
+query TeochewQuery($simpChin: String, $tradChin: String) {
+    genPartialDict(simpChin: $simpChin, tradChin: $tradChin) {
+        pinyinChaoyinDictRes
+        teochewAudioDictRes
+    }
+}
+`;
 
 let isEnabled = localStorage['enabled'] === '1';
 
@@ -363,6 +371,32 @@ function filterRepeatedChars(simpChars, tradChars) {
             }
 }
 
+async function fetchAssets(backendHost, simpChin, tradChin) {
+    if (backendHost.endsWith(".aws")) {
+        let response = await fetch(`${backendHost}/graphql`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                query: GRAPHQL_QUERY,
+                variables: { simpChin, tradChin },
+            }),
+        })
+        .then(res => res.json())
+        .catch(err => console.log(err));
+
+        return response?.data?.genPartialDict || {pinyinChaoyinDictRes: {}, teochewAudioDictRes: {}};
+
+    }
+    else {
+        return await fetch(`${backendHost}/extsearch/${simpChin}/${tradChin}`)
+                    .then(res => res.json())
+                    .catch(err => console.log(err))
+                    || {pinyinChaoyinDictRes: {}, teochewAudioDictRes: {}};
+    }
+}
+
 chrome.browserAction.onClicked.addListener(activateExtensionToggle);
 
 chrome.tabs.onActivated.addListener(activeInfo => enableTab(activeInfo.tabId));
@@ -511,13 +545,12 @@ mozilla.runtime.onMessage.addListener(async function (request, sender, response)
                                                     request.tradChars);
 
             if (newSimpChars) {
-                const {pinyinChaoyinDictRes, teochewAudioDictRes} 
-                        = await fetch(LB_API_URLS[Math.floor(Math.random() * LB_API_URLS.length)] + '/extsearch/'
-                                + newSimpChars + '/' + newTradChars)
-                                .then(res => res.json())
-                                .catch(err => console.log(err))
-                                || {pinyinChaoyinDictRes: {}, teochewAudioDictRes: {}};
-                            
+                const backendHost = LB_API_URLS[Math.floor(Math.random() * LB_API_URLS.length)];
+
+                const {
+                    pinyinChaoyinDictRes,
+                    teochewAudioDictRes,
+                } = await fetchAssets(backendHost, newSimpChars, newTradChars);
 
                 teochewDict = Object.assign(teochewDict, pinyinChaoyinDictRes);
                 teochewAudioDict = Object.assign(teochewAudioDict, teochewAudioDictRes);
