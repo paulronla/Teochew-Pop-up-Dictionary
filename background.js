@@ -53,19 +53,12 @@
 'use strict';
 
 import { ZhongwenDictionary } from './dict.js';
+import { genGraphQLQuery } from './background/graphql.js';
 
 const API_URL = 'https://www.teochewspot.com';
 const AWS_URL = 'https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws';
 const API_URLS = [API_URL, AWS_URL];
 const LB_API_URLS = [AWS_URL, API_URL, API_URL];
-const GRAPHQL_QUERY = `
-query TeochewQuery($simpChin: String, $tradChin: String) {
-    genPartialDict(simpChin: $simpChin, tradChin: $tradChin) {
-        pinyinChaoyinDictRes
-        teochewAudioDictRes
-    }
-}
-`;
 
 let isEnabled = localStorage['enabled'] === '1';
 
@@ -373,18 +366,7 @@ function filterRepeatedChars(simpChars, tradChars) {
 
 async function fetchAssets(backendHost, simpChin, tradChin) {
     if (backendHost.endsWith(".aws")) {
-        let response = await fetch(`${backendHost}/graphql`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                query: GRAPHQL_QUERY,
-                variables: { simpChin, tradChin },
-            }),
-        })
-        .then(res => res.json())
-        .catch(err => console.log(err));
+        let response = await genGraphQLQuery(backendHost, simpChin, tradChin);
 
         return response?.data?.genPartialDict || {pinyinChaoyinDictRes: {}, teochewAudioDictRes: {}};
 
