@@ -58,7 +58,7 @@ $(document).ready(function () {
     });
 
     let deleteButton = $('#delete');
-    deleteButton.click(function () {
+    deleteButton.click(async function () {
         table.rows('.bg-info').remove();
 
         let entries = table.rows().data().draw(true);
@@ -68,7 +68,9 @@ $(document).ready(function () {
             toKeep.push(entries[i]);
         }
 
-        localStorage['wordlist'] = JSON.stringify(toKeep);
+        const toKeepStr = JSON.stringify(toKeep);
+        localStorage['wordlist'] = toKeepStr;
+        await chrome.storage.local.set({'wordlist': toKeepStr});
 
         // location.reload(true);
     });

@@ -7,7 +7,7 @@ query TeochewQuery($simpChin: String, $tradChin: String) {
 }
 `;
 
-export async function genGraphQLQuery(backendHost, simpChin, tradChin) {
+async function genGraphQLQuery(backendHost, simpChin, tradChin) {
     return await fetch(`${backendHost}/graphql`, {
         method: "POST",
         headers: {
@@ -21,3 +21,5 @@ export async function genGraphQLQuery(backendHost, simpChin, tradChin) {
     .then(res => res.json())
     .catch(err => console.log(err));
 }
+
+globalThis.genGraphQLQuery = genGraphQLQuery;

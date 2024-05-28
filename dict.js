@@ -46,7 +46,7 @@
 
 'use strict';
 
-export class ZhongwenDictionary {
+class ZhongwenDictionary {
 
     constructor(wordDict, wordIndex, grammarKeywords) {
         this.wordDict = wordDict;
@@ -137,3 +137,5 @@ export class ZhongwenDictionary {
         return entry;
     }
 }
+
+globalThis.ZhongwenDictionary = ZhongwenDictionary;

@@ -1,10 +1,9 @@
 {
     "author": "Paul La",
     "background": {
-        "page": "background.html",
-		"persistent": true
+        "service_worker": "background.js"
     },
-    "browser_action": {
+    "action": {
         "default_icon": {
 			"20": "images/teochew_20.png",
             "40": "images/teochew_40.png",
@@ -34,22 +33,35 @@
         "48": "images/teochew_48.png",
         "128": "images/teochew_128.png"
     },
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Teochew Pop-up Dictionary",
     "options_page": "options.html",
     "permissions": [
         "contextMenus",
-        "tabs",
-		"https://www.teochewspot.com/",
+        "offscreen",
+        "storage",
+        "tabs"
+    ],
+    "host_permissions": [
+        "https://www.teochewspot.com/",
         "https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws/"
     ],
-    "content_security_policy": "default-src 'self'; connect-src https://www.teochewspot.com/ https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws/;",
+    "content_security_policy": {
+        "extension_pages": "default-src 'self'; connect-src https://www.teochewspot.com/ https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws/;"
+    },
     "short_name": "Teochew",
     "version": "2.3.0",
     "web_accessible_resources": [
-        "css/*",
-        "js/*",
-        "images/*"
+        {
+            "resources": [
+                "css/*",
+                "js/*",
+                "images/*"
+            ],
+            "matches": [
+                "*://*/*"
+            ]
+        }
     ],
     "-ms-preload": {
         "backgroundScript": "backgroundScriptsAPIBridge.js",

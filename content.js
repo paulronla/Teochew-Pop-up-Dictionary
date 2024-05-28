@@ -700,7 +700,7 @@ function showPopup(html, elem, x, y, looseWidth) {
         css.setAttribute('id', 'zhongwen-css');
         css.setAttribute('rel', 'stylesheet');
         css.setAttribute('type', 'text/css');
-        let theme = config.css;
+        let theme = config.popupcolor;
         css.setAttribute('href', chrome.runtime.getURL('css/popup-' +
             theme + '.css'));
 
@@ -939,10 +939,14 @@ function findPreviousTextNode(root, previous) {
 }
 
 function copyToClipboard(data) {
-    chrome.runtime.sendMessage({
-        'type': 'copy',
-        'data': data
-    });
+    let txt = document.createElement('textarea');
+    txt.style.position = "absolute";
+    txt.style.left = "-100%";
+    txt.value = data;
+    document.body.appendChild(txt);
+    txt.select();
+    document.execCommand('copy');
+    document.body.removeChild(txt);
 
     showPopup('Copied to clipboard', null, -1, -1);
 }

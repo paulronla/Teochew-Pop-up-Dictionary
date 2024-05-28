@@ -79,38 +79,40 @@ function loadVals() {
     }
 }
 
-function storeVals() {
-
-    const backgroundPage = chrome.extension.getBackgroundPage();
+async function storeVals() {
 
     localStorage['popupcolor'] = document.optform.popupcolor.value;
-    backgroundPage.zhongwenOptions.css = localStorage['popupcolor'];
 
     localStorage['tonecolors'] = document.optform.tonecolors.value;
-    backgroundPage.zhongwenOptions.tonecolors = localStorage['tonecolors'];
 
     localStorage['fontSize'] = document.optform.fontSize.value;
-    backgroundPage.zhongwenOptions.fontSize = localStorage['fontSize'];
 
     localStorage['skritterTLD'] = document.optform.skritterTLD.value;
-    backgroundPage.zhongwenOptions.skritterTLD = localStorage['skritterTLD'];
 
     localStorage['pinyin'] = document.optform.pinyin.value;
-    backgroundPage.zhongwenOptions.pinyin = localStorage['pinyin'];
 
     localStorage['zhuyin'] = document.optform.zhuyin.value;
-    backgroundPage.zhongwenOptions.zhuyin = localStorage['zhuyin'];
 
     localStorage['grammar'] = document.optform.grammar.value;
-    backgroundPage.zhongwenOptions.grammar = localStorage['grammar'];
 
     localStorage['simpTrad'] = document.optform.simpTrad.value;
-    backgroundPage.zhongwenOptions.simpTrad = localStorage['simpTrad'];
 
     localStorage['toneColorScheme'] = document.optform.toneColorScheme.value;
-    backgroundPage.zhongwenOptions.toneColorScheme = localStorage['toneColorScheme'];
 
     localStorage['saveToWordList'] = document.optform.saveToWordList.value;
+
+    await chrome.storage.local.set({
+        'popupcolor': document.optform.popupcolor.value,
+        'tonecolors': document.optform.tonecolors.value,
+        'fontSize': document.optform.fontSize.value,
+        'skritterTLD': document.optform.skritterTLD.value,
+        'pinyin': document.optform.pinyin.value,
+        'zhuyin': document.optform.zhuyin.value,
+        'grammar': document.optform.grammar.value,
+        'simpTrad': document.optform.simpTrad.value,
+        'toneColorScheme': document.optform.toneColorScheme.value,
+        'saveToWordList': document.optform.saveToWordList.value
+    });
 }
 
 $(function () {

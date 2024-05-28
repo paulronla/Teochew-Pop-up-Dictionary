@@ -52,23 +52,25 @@
 
 'use strict';
 
-import { ZhongwenDictionary } from './dict.js';
-import { genGraphQLQuery } from './background/graphql.js';
+(async () => {
+importScripts(
+    './js/genChaoyin.js',
+    './js/playChaoyin.js',
+    './js/browser-polyfill.min.js',
+    './dict.js',
+    './background/graphql.js'
+);
 
 const API_URL = 'https://www.teochewspot.com';
 const AWS_URL = 'https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.on.aws';
 const API_URLS = [API_URL, AWS_URL];
 const LB_API_URLS = [AWS_URL, API_URL, API_URL];
 
-let isEnabled = localStorage['enabled'] === '1';
+let isEnabled = await chrome.storage.local.get('enabled') === '1';
 
 let isActivated = false;
 
-let playingAudio = false;
-
 let tabIDs = {};
-
-let reversedMp3URLArr = [];
 
 let dict;
 
@@ -76,23 +78,76 @@ let teochewDict = {};
 
 let teochewAudioDict = {};
 
-let zhongwenOptions = window.zhongwenOptions = {
-    css: localStorage['popupcolor'] || 'yellow',
-    tonecolors: localStorage['tonecolors'] || 'yes',
-    fontSize: localStorage['fontSize'] || 'small',
-    skritterTLD: localStorage['skritterTLD'] || 'com',
-    pinyin: localStorage['pinyin'] || 'yes',
-    zhuyin: localStorage['zhuyin'] || 'no',
-    grammar: localStorage['grammar'] || 'yes',
-    simpTrad: localStorage['simpTrad'] || 'classic',
-    toneColorScheme: localStorage['toneColorScheme'] || 'standard'
-};
+let creating; // A global promise to avoid concurrency issues
+async function setupOffscreenDocument(path) {
+  // Check all windows controlled by the service worker to see if one
+  // of them is the offscreen document with the given path
+  const offscreenUrl = chrome.runtime.getURL(path);
+  const existingContexts = await chrome.runtime.getContexts({
+    contextTypes: ['OFFSCREEN_DOCUMENT'],
+    documentUrls: [offscreenUrl]
+  });
 
-function activateExtension(tabId, showHelp) {
+  if (existingContexts.length > 0) {
+    return;
+  }
+
+  // create offscreen document
+  if (creating) {
+    await creating;
+  } else {
+    creating = chrome.offscreen.createDocument({
+      url: path,
+      reasons: ['LOCAL_STORAGE', 'AUDIO_PLAYBACK'],
+      justification: 'migrate storage and play teochew pronunciation',
+    });
+    await creating;
+    creating = null;
+  }
+}
+
+if (!(await chrome.storage.local.get('popupcolor')).popupcolor) {
+    await setupOffscreenDocument('offscreen.html');
+
+    const options = await chrome.runtime.sendMessage({
+        type: 'migrateStorage',
+        target: 'offscreen',
+        options: await chrome.storage.local.get([
+            'popupcolor',
+            'tonecolors',
+            'fontSize',
+            'skritterTLD',
+            'pinyin',
+            'zhuyin',
+            'grammar',
+            'simpTrad',
+            'toneColorScheme',
+            'saveToWordList',
+            'wordlist'
+        ])
+    });
+
+    await chrome.storage.local.set(options);
+}
+
+let zhongwenOptions = await chrome.storage.local.get([
+    'popupcolor',
+    'tonecolors',
+    'fontSize',
+    'skritterTLD',
+    'pinyin',
+    'zhuyin',
+    'grammar',
+    'simpTrad',
+    'toneColorScheme',
+    'saveToWordList',
+    'wordlist'
+]);
+
+async function activateExtension(tabId, showHelp) {
 
     isEnabled = true;
-    // values in localStorage are always strings
-    localStorage['enabled'] = '1';
+    await chrome.storage.local.set({'enabled': '1'});
     
     API_URLS.forEach(url => fetch(url + '/extsearch')); //wake up services
 
@@ -111,11 +166,11 @@ function activateExtension(tabId, showHelp) {
         });
     }
 
-    chrome.browserAction.setBadgeBackgroundColor({
+    chrome.action.setBadgeBackgroundColor({
         'color': [255, 0, 0, 255]
     });
 
-    chrome.browserAction.setBadgeText({
+    chrome.action.setBadgeText({
         'text': 'On'
     });
 
@@ -188,8 +243,8 @@ function activateExtension(tabId, showHelp) {
         }
     );
 
-    let player = document.getElementById('teochew-ext-player');
-    player.addEventListener('ended', playNext, false);
+    // let player = document.getElementById('teochew-ext-player');
+    // player.addEventListener('ended', playNext, false);
 
     isActivated = true;
 }
@@ -211,19 +266,18 @@ async function loadDictionary() {
     return new ZhongwenDictionary(wordDict, wordIndex, grammarKeywords);
 }
 
-function deactivateExtension() {
+async function deactivateExtension() {
 
     isEnabled = false;
-    // values in localStorage are always strings
-    localStorage['enabled'] = '0';
+    await chrome.storage.local.set({'enabled': '0'});
 
     dict = undefined;
 
-    chrome.browserAction.setBadgeBackgroundColor({
+    chrome.action.setBadgeBackgroundColor({
         'color': [0, 0, 0, 0]
     });
 
-    chrome.browserAction.setBadgeText({
+    chrome.action.setBadgeText({
         'text': ''
     });
 
@@ -244,25 +298,25 @@ function deactivateExtension() {
 
     chrome.contextMenus.removeAll();
 
-    let player = document.getElementById('teochew-ext-player');
-    player.removeEventListener('ended', playNext, false);
+    // let player = document.getElementById('teochew-ext-player');
+    // player.removeEventListener('ended', playNext, false);
 
     isActivated = false;
 }
 
-function activateExtensionToggle(currentTab) {
+async function activateExtensionToggle(currentTab) {
     if (isActivated) {
-        deactivateExtension();
+        await deactivateExtension();
     } else {
-        activateExtension(currentTab.id, true);
+        await activateExtension(currentTab.id, true);
     }
 }
 
-function enableTab(tabId) {
+async function enableTab(tabId) {
     if (isEnabled) {
 
         if (!isActivated) {
-            activateExtension(tabId, false);
+            await activateExtension(tabId, false);
         }
 
         chrome.tabs.sendMessage(tabId, {
@@ -292,53 +346,6 @@ function search(text) {
     }
 
     return entry;
-}
-
-async function playAudio(chaoyin, teochewAudioDict) {
-    if (playingAudio) {
-        return;
-    }
-
-    playingAudio = true;
-
-    //on the rare occasion array doesn't get cleared out in playNext callback
-    while (reversedMp3URLArr.length) {
-        URL.revokeObjectURL(reversedMp3URLArr.pop());
-    }
-
-    if (teochewAudioDict) {
-        reversedMp3URLArr = await loadAudio(chaoyin, teochewAudioDict).catch(err => {
-            console.log(err);
-        }) || reversedMp3URLArr;
-    }
-
-    if (reversedMp3URLArr.length) {
-        const player = document.getElementById('teochew-ext-player');
-        player.src = reversedMp3URLArr[reversedMp3URLArr.length-1];
-        player.play();
-    }
-
-    playingAudio = false;
-}
-
-function playNext() {
-    URL.revokeObjectURL(reversedMp3URLArr.pop());
-
-    if (reversedMp3URLArr.length) {
-        const player = document.getElementById('teochew-ext-player');
-        player.src = reversedMp3URLArr[reversedMp3URLArr.length-1];
-        player.play();
-    }
-}
-
-function loadAudio(chaoyin, teochewAudioDict) {
-    const chaoyinArr = chaoyin.split(' ');
-
-    return Promise.all(chaoyinArr.reverse().map(chaoyin => 
-        fetch(API_URL + '/audio/' + teochewAudioDict[chaoyin] + '.mp3')
-        .then(res => res.blob())
-        .then(blob => URL.createObjectURL(blob))
-    ));
 }
 
 function filterRepeatedChars(simpChars, tradChars) {
@@ -379,26 +386,30 @@ async function fetchAssets(backendHost, simpChin, tradChin) {
     }
 }
 
-chrome.browserAction.onClicked.addListener(activateExtensionToggle);
+chrome.action.onClicked.addListener(activateExtensionToggle);
 
-chrome.tabs.onActivated.addListener(activeInfo => enableTab(activeInfo.tabId));
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo) {
+chrome.tabs.onActivated.addListener(async activeInfo => await enableTab(activeInfo.tabId));
+chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
     if (changeInfo.status === 'complete') {
-        enableTab(tabId);
+        await enableTab(tabId);
     }
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, response) {
+chrome.runtime.onMessage.addListener(async function (request, sender, response) {
 
     let tabID;
 
     switch (request.type) {
 
         case 'playAudio': {
-            if (!reversedMp3URLArr.length 
-                    || document.getElementById('teochew-ext-player').paused) {
-                playAudio(request.chaoyin, teochewAudioDict);
-            }
+            await setupOffscreenDocument('offscreen.html');
+
+            chrome.runtime.sendMessage({
+                'type': 'playAudioOffscreen',
+                'target': 'offscreen',
+                'chaoyin': request.chaoyin,
+                'teochewAudioDict': teochewAudioDict
+            });
         }
             break;
 
@@ -441,22 +452,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
             }
             break;
 
-        case 'copy': {
-            let txt = document.createElement('textarea');
-            txt.style.position = "absolute";
-            txt.style.left = "-100%";
-            txt.value = request.data;
-            document.body.appendChild(txt);
-            txt.select();
-            document.execCommand('copy');
-            document.body.removeChild(txt);
-        }
-            break;
-
         case 'add': {
-            let json = localStorage['wordlist'];
+            let json = zhongwenOptions['wordlist'];
 
-            let saveFirstEntryOnly = localStorage['saveToWordList'] === 'firstEntryOnly';
+            let saveFirstEntryOnly = zhongwenOptions['saveToWordList'] === 'firstEntryOnly';
 
             let wordlist;
             if (json) {
@@ -479,7 +478,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
                     break;
                 }
             }
-            localStorage['wordlist'] = JSON.stringify(wordlist);
+            const wordlistStr = JSON.stringify(wordlist);
+            zhongwenOptions['wordlist'] = wordlistStr;
+            await chrome.storage.local.set({'wordlist': wordlistStr});
 
             tabID = tabIDs['wordlist'];
             if (tabID) {
@@ -543,3 +544,4 @@ mozilla.runtime.onMessage.addListener(async function (request, sender, response)
             break;
     }
 });
+})();
