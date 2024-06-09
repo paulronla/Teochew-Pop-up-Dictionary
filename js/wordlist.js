@@ -4,7 +4,8 @@
  https://chrome.google.com/extensions/detail/kkmlkkjojmombglmlpbpapmhcaljjkde
  */
 
-let wordList = localStorage['wordlist'];
+(async () => {
+let { wordlist: wordList } = await chrome.storage.local.get('wordlist');
 
 let entries;
 if (wordList) {
@@ -93,3 +94,4 @@ $(document).ready(function () {
         deleteButton.hide();
     }
 });
+})();

@@ -66,7 +66,7 @@ const AWS_URL = 'https://ycsyuqckpfe5addllgynkolgba0dkniu.lambda-url.us-west-1.o
 const API_URLS = [API_URL, AWS_URL];
 const LB_API_URLS = [AWS_URL, API_URL, API_URL];
 
-let isEnabled = await chrome.storage.local.get('enabled') === '1';
+let isEnabled = await chrome.storage.local.get('enabled').enabled === '1';
 
 let isActivated = false;
 
@@ -77,6 +77,16 @@ let dict;
 let teochewDict = {};
 
 let teochewAudioDict = {};
+
+let intervalID = null;
+
+function keepAlive() {
+    if (intervalID !== null) {
+        clearInterval(intervalID);
+    }
+
+    intervalID = setInterval(chrome.runtime.getPlatformInfo, 20e3);
+}
 
 let creating; // A global promise to avoid concurrency issues
 async function setupOffscreenDocument(path) {
@@ -130,21 +140,10 @@ if (!(await chrome.storage.local.get('popupcolor')).popupcolor) {
     await chrome.storage.local.set(options);
 }
 
-let zhongwenOptions = await chrome.storage.local.get([
-    'popupcolor',
-    'tonecolors',
-    'fontSize',
-    'skritterTLD',
-    'pinyin',
-    'zhuyin',
-    'grammar',
-    'simpTrad',
-    'toneColorScheme',
-    'saveToWordList',
-    'wordlist'
-]);
+let zhongwenOptions;
 
 async function activateExtension(tabId, showHelp) {
+    keepAlive();
 
     isEnabled = true;
     await chrome.storage.local.set({'enabled': '1'});
@@ -154,6 +153,20 @@ async function activateExtension(tabId, showHelp) {
     if (!dict) {
         loadDictionary().then(r => dict = r);
     }
+
+    zhongwenOptions = await chrome.storage.local.get([
+        'popupcolor',
+        'tonecolors',
+        'fontSize',
+        'skritterTLD',
+        'pinyin',
+        'zhuyin',
+        'grammar',
+        'simpTrad',
+        'toneColorScheme',
+        'saveToWordList',
+        'wordlist'
+    ]);
 
     chrome.tabs.sendMessage(tabId, {
         'type': 'enable',
@@ -267,6 +280,8 @@ async function loadDictionary() {
 }
 
 async function deactivateExtension() {
+    clearInterval(intervalID);
+    intervalID = null;
 
     isEnabled = false;
     await chrome.storage.local.set({'enabled': '0'});
